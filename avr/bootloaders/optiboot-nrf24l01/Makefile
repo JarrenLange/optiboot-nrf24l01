@@ -255,6 +255,30 @@ atmega168_isp: LFUSE ?= FF
 # 512 byte boot
 atmega168_isp: EFUSE ?= 04
 atmega168_isp: isp
+	
+#For my Atmega168p Driven Sensors with Over the Air Updates from 
+#NRF24 
+#
+atmega168prf: TARGET = atmega168p
+atmega168prf: MCU_TARGET = atmega168
+atmega168prf: CFLAGS += $(COMMON_OPTIONS)
+atmega168prf: CFLAGS += -DLED_START_FLASHES=0 -DRADIO_UART=1 -DFORCE_WATCHDOG=1 -DSUPPORT_EEPROM=1
+atmega168prf: AVR_FREQ ?= 8000000L 
+	#Current NRF Bootloader is very space inefficient. So need more 
+	#Boot area This needs to be checked with the Fuses as well...
+atmega168prf: LDSECTIONS  = -Wl,--section-start=.text=0x3800 -Wl,--section-start=.version=0x3ffe
+atmega168prf: $(PROGRAM)_atmega168prf.hex
+atmega168prf: $(PROGRAM)_atmega168prf.lst
+
+atmega168prf_isp: atmega168
+atmega168prf_isp: TARGET = atmega168
+# 1.8V brownout
+atmega168prf_isp: HFUSE ?= DE
+# Low power xtal (8MHz) 16KCK/14CK+65ms
+atmega168prf_isp: LFUSE ?= F7
+# 512 Word boot
+atmega168prf_isp: EFUSE ?= F9
+atmega168prf_isp: isp
 
 atmega328: TARGET = atmega328
 atmega328: MCU_TARGET = atmega328p
@@ -637,6 +661,12 @@ isp-stk500: $(PROGRAM)_$(TARGET).hex
 %.elf: $(OBJ) baudcheck $(dummy)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
 	$(SIZE) $@
+upload:
+	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U efuse:w:0xF9:m #Apparrently for 1kB boot, eFuse = F8?
+	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U hfuse:w:0xDE:m # 1.8V brownout
+	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U lfuse:w:0xFA:m # Internal RC 8Mhz 6CK/14CK + 65ms
+	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -U flash:w:optiboot_atmega168prf.hex -v
+	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -U lock:w:0x0F:m -v
 
 clean:
 	rm -rf *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex *.tmp.sh
@@ -652,3 +682,4 @@ clean:
 
 %.bin: %.elf
 	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O binary $< $@
+

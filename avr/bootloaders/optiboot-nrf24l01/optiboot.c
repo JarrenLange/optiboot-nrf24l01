@@ -338,7 +338,7 @@ static void radio_init(void);
  * RAMSTART should be self-explanatory.  It's bigger on parts with a
  * lot of peripheral registers.
  */
-#if defined(__AVR_ATmega168__)
+#if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega168p__)
 #define RAMSTART (0x100)
 #define NRWWSTART (0x3800)
 #elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32__)

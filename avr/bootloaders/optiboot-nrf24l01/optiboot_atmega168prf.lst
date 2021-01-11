@@ -1,0 +1,1244 @@
+
+optiboot_atmega168prf.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000002  00800100  00003e62  000006f6  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000662  00003800  00003800  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .version      00000002  00003ffe  00003ffe  000006f8  2**0
+                  CONTENTS, READONLY
+  3 .bss          00000046  00800102  00800102  000006f8  2**0
+                  ALLOC
+  4 .comment      00000012  00000000  00000000  000006fa  2**0
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000028  00000000  00000000  0000070c  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  6 .debug_info   00001445  00000000  00000000  00000734  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  7 .debug_abbrev 0000045e  00000000  00000000  00001b79  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  8 .debug_line   000017aa  00000000  00000000  00001fd7  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  9 .debug_frame  00000198  00000000  00000000  00003784  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 10 .debug_str    000003a5  00000000  00000000  0000391c  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 11 .debug_loc    00000a64  00000000  00000000  00003cc1  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 12 .debug_ranges 00000170  00000000  00000000  00004725  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+00003800 <main>:
+
+  return EEDR;
+}
+
+/* main program starts here */
+int main(void) {
+    3800:	00 d0       	rcall	.+0      	; 0x3802 <main+0x2>
+    3802:	0f 92       	push	r0
+    3804:	cd b7       	in	r28, 0x3d	; 61
+    3806:	de b7       	in	r29, 0x3e	; 62
+  //  SP points to RAMEND
+  //  r1 contains zero
+  //
+  // If not, uncomment the following instructions:
+  // cli();
+  asm volatile ("cli");
+    3808:	f8 94       	cli
+  asm volatile ("clr __zero_reg__");
+    380a:	11 24       	eor	r1, r1
+   * force the watchdog to run before jumping to userspace, so that if
+   * a buggy program is uploaded, the board resets automatically.  We
+   * still use the watchdog to reset the bootloader too.
+   */
+#ifdef FORCE_WATCHDOG
+  SP = RAMEND - 32;
+    380c:	8f ed       	ldi	r24, 0xDF	; 223
+    380e:	94 e0       	ldi	r25, 0x04	; 4
+    3810:	9e bf       	out	0x3e, r25	; 62
+    3812:	8d bf       	out	0x3d, r24	; 61
+#define reset_cause (*(uint8_t *) (RAMEND - 16 - 4))
+#define marker (*(uint32_t *) (RAMEND - 16 - 3))
+
+  /* GCC does loads Y with SP at the beginning, repeat it with the new SP */
+  asm volatile ("in r28, 0x3d");
+    3814:	cd b7       	in	r28, 0x3d	; 61
+  asm volatile ("in r29, 0x3e");
+    3816:	de b7       	in	r29, 0x3e	; 62
+
+  ch = MCUSR;
+    3818:	84 b7       	in	r24, 0x34	; 52
+  MCUSR = 0;
+    381a:	14 be       	out	0x34, r1	; 52
+  if ((ch & _BV(WDRF)) && marker == 0xdeadbeef) {
+    381c:	83 ff       	sbrs	r24, 3
+    381e:	18 c0       	rjmp	.+48     	; 0x3850 <main+0x50>
+    3820:	40 91 ec 04 	lds	r20, 0x04EC	; 0x8004ec <__bss_end+0x3a4>
+    3824:	50 91 ed 04 	lds	r21, 0x04ED	; 0x8004ed <__bss_end+0x3a5>
+    3828:	60 91 ee 04 	lds	r22, 0x04EE	; 0x8004ee <__bss_end+0x3a6>
+    382c:	70 91 ef 04 	lds	r23, 0x04EF	; 0x8004ef <__bss_end+0x3a7>
+    3830:	4f 3e       	cpi	r20, 0xEF	; 239
+    3832:	5e 4b       	sbci	r21, 0xBE	; 190
+    3834:	6d 4a       	sbci	r22, 0xAD	; 173
+    3836:	7e 4d       	sbci	r23, 0xDE	; 222
+    3838:	59 f4       	brne	.+22     	; 0x3850 <main+0x50>
+    marker = 0;
+    383a:	10 92 ec 04 	sts	0x04EC, r1	; 0x8004ec <__bss_end+0x3a4>
+    383e:	10 92 ed 04 	sts	0x04ED, r1	; 0x8004ed <__bss_end+0x3a5>
+    3842:	10 92 ee 04 	sts	0x04EE, r1	; 0x8004ee <__bss_end+0x3a6>
+    3846:	10 92 ef 04 	sts	0x04EF, r1	; 0x8004ef <__bss_end+0x3a7>
+    appStart(reset_cause);
+    384a:	80 91 eb 04 	lds	r24, 0x04EB	; 0x8004eb <__bss_end+0x3a3>
+    384e:	ff d2       	rcall	.+1534   	; 0x3e4e <appStart>
+  }
+  /* Save the original reset reason to pass on to the applicatoin */
+  reset_cause = ch;
+    3850:	80 93 eb 04 	sts	0x04EB, r24	; 0x8004eb <__bss_end+0x3a3>
+  marker = 0xdeadbeef;
+    3854:	8f ee       	ldi	r24, 0xEF	; 239
+    3856:	9e eb       	ldi	r25, 0xBE	; 190
+    3858:	ad ea       	ldi	r26, 0xAD	; 173
+    385a:	be ed       	ldi	r27, 0xDE	; 222
+    385c:	80 93 ec 04 	sts	0x04EC, r24	; 0x8004ec <__bss_end+0x3a4>
+    3860:	90 93 ed 04 	sts	0x04ED, r25	; 0x8004ed <__bss_end+0x3a5>
+    3864:	a0 93 ee 04 	sts	0x04EE, r26	; 0x8004ee <__bss_end+0x3a6>
+    3868:	b0 93 ef 04 	sts	0x04EF, r27	; 0x8004ef <__bss_end+0x3a7>
+    appStart(ch);
+#endif
+
+#if BSS_SIZE > 0
+  // Prepare .data
+  asm volatile (
+    386c:	11 e0       	ldi	r17, 0x01	; 1
+    386e:	a0 e0       	ldi	r26, 0x00	; 0
+    3870:	b1 e0       	ldi	r27, 0x01	; 1
+    3872:	e2 e6       	ldi	r30, 0x62	; 98
+    3874:	fe e3       	ldi	r31, 0x3E	; 62
+    3876:	02 c0       	rjmp	.+4      	; 0x387c <cpchk>
+
+00003878 <copy>:
+    3878:	05 90       	lpm	r0, Z+
+    387a:	0d 92       	st	X+, r0
+
+0000387c <cpchk>:
+    387c:	a2 30       	cpi	r26, 0x02	; 2
+    387e:	b1 07       	cpc	r27, r17
+    3880:	d9 f7       	brne	.-10     	; 0x3878 <copy>
+	"	st	X+, __tmp_reg__\n"
+	"cpchk:	cpi	r26, lo8(__data_end)\n"
+	"	cpc	r27, r17\n"
+	"	brne	copy\n");
+  // Prepare .bss
+  asm volatile (
+    3882:	11 e0       	ldi	r17, 0x01	; 1
+    3884:	a2 e0       	ldi	r26, 0x02	; 2
+    3886:	b1 e0       	ldi	r27, 0x01	; 1
+    3888:	01 c0       	rjmp	.+2      	; 0x388c <clchk>
+
+0000388a <clear>:
+    388a:	1d 92       	st	X+, r1
+
+0000388c <clchk>:
+    388c:	a8 34       	cpi	r26, 0x48	; 72
+    388e:	b1 07       	cpc	r27, r17
+    3890:	e1 f7       	brne	.-8      	; 0x388a <clear>
+  /*
+   * Disable pullups that may have been enabled by a user program.
+   * Somehow a pullup on RXD screws up everything unless RXD is externally
+   * driven high.
+   */
+  DDRD |= 3;
+    3892:	8a b1       	in	r24, 0x0a	; 10
+    3894:	83 60       	ori	r24, 0x03	; 3
+    3896:	8a b9       	out	0x0a, r24	; 10
+  PORTD &= ~3;
+    3898:	8b b1       	in	r24, 0x0b	; 11
+    389a:	8c 7f       	andi	r24, 0xFC	; 252
+    389c:	8b b9       	out	0x0b, r24	; 11
+  UCSRA = _BV(U2X); //Double speed mode USART
+  UCSRB = _BV(RXEN) | _BV(TXEN);  // enable Rx & Tx
+  UCSRC = _BV(URSEL) | _BV(UCSZ1) | _BV(UCSZ0);  // config USART; 8N1
+  UBRRL = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
+#else
+  UART_SRA = _BV(U2X0); //Double speed mode USART0
+    389e:	82 e0       	ldi	r24, 0x02	; 2
+    38a0:	80 93 c0 00 	sts	0x00C0, r24	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7e00c0>
+  UART_SRB = _BV(RXEN0) | _BV(TXEN0);
+    38a4:	88 e1       	ldi	r24, 0x18	; 24
+    38a6:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+  UART_SRC = _BV(UCSZ00) | _BV(UCSZ01);
+    38aa:	86 e0       	ldi	r24, 0x06	; 6
+    38ac:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7e00c2>
+  UART_SRL = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
+    38b0:	88 e0       	ldi	r24, 0x08	; 8
+    38b2:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
+	(void) SPDR;
+}
+
+static void spi_init(void) {
+	/* Initialize the SPI pins: SCK & MOSI as outputs, MISO as input */
+	SPI_DDR |= SCK_PIN | MOSI_PIN;
+    38b6:	84 b1       	in	r24, 0x04	; 4
+    38b8:	88 62       	ori	r24, 0x28	; 40
+    38ba:	84 b9       	out	0x04, r24	; 4
+	SPI_DDR &= ~MISO_PIN;
+    38bc:	24 98       	cbi	0x04, 4	; 4
+	/* Must also pre-set SS to output, otherwise it's going to bite us */
+	SPI_DDR |= SS_PIN;
+    38be:	22 9a       	sbi	0x04, 2	; 4
+	SPCR = 0;
+    38c0:	1c bc       	out	0x2c, r1	; 44
+	SPCR = (mode & 0x7F) | (1 << SPE) | (1 << MSTR);
+    38c2:	80 e5       	ldi	r24, 0x50	; 80
+    38c4:	8c bd       	out	0x2c, r24	; 44
+	SPSR = 1 << SPI2X; /* double speed */
+    38c6:	01 e0       	ldi	r16, 0x01	; 1
+    38c8:	0d bd       	out	0x2d, r16	; 45
+	(void) SPSR;
+    38ca:	8d b5       	in	r24, 0x2d	; 45
+	(void) SPDR;
+    38cc:	8e b5       	in	r24, 0x2e	; 46
+#define CONFIG_VAL ((1 << MASK_RX_DR) | (1 << MASK_TX_DS) | \
+		(1 << MASK_MAX_RT) | (1 << CRCO) | (1 << EN_CRC))
+
+static int nrf24_init(void) {
+	/* CE and CSN are outputs */
+	CE_DDR |= CE_PIN;
+    38ce:	21 9a       	sbi	0x04, 1	; 4
+	CSN_DDR |= CSN_PIN;
+    38d0:	22 9a       	sbi	0x04, 2	; 4
+
+	nrf24_ce(0);
+    38d2:	80 e0       	ldi	r24, 0x00	; 0
+	if (level)
+    38d4:	39 d1       	rcall	.+626    	; 0x3b48 <nrf24_ce>
+	my_delay(5);
+    38d6:	36 d1       	rcall	.+620    	; 0x3b44 <nrf24_csn.part.0>
+    38d8:	88 e8       	ldi	r24, 0x88	; 136
+    38da:	93 e1       	ldi	r25, 0x13	; 19
+	nrf24_csn(1);
+	nrf24_delay();
+
+	/* 2ms interval, 15 retries (16 total) */
+	nrf24_write_reg(SETUP_RETR, 0x7f);
+    38dc:	27 d1       	rcall	.+590    	; 0x3b2c <delay8>
+    38de:	6f e7       	ldi	r22, 0x7F	; 127
+    38e0:	84 e0       	ldi	r24, 0x04	; 4
+	nrf24_csn(0);
+    38e2:	40 d1       	rcall	.+640    	; 0x3b64 <nrf24_write_reg>
+	spi_transfer(addr | R_REGISTER);
+    38e4:	3d d1       	rcall	.+634    	; 0x3b60 <nrf24_csn.constprop.0>
+    38e6:	84 e0       	ldi	r24, 0x04	; 4
+    38e8:	17 d1       	rcall	.+558    	; 0x3b18 <spi_transfer>
+	ret = spi_transfer(0);
+    38ea:	80 e0       	ldi	r24, 0x00	; 0
+    38ec:	15 d1       	rcall	.+554    	; 0x3b18 <spi_transfer>
+    38ee:	18 2f       	mov	r17, r24
+	if (level)
+    38f0:	29 d1       	rcall	.+594    	; 0x3b44 <nrf24_csn.part.0>
+	if (nrf24_read_reg(SETUP_RETR) != 0x7f)
+    38f2:	1f 37       	cpi	r17, 0x7F	; 127
+		return 1; /* There may be no nRF24 connected */
+
+	/* Maximum Tx power, 250kbps data rate */
+	nrf24_write_reg(RF_SETUP, (1 << RF_PWR_LOW) | (1 << RF_PWR_HIGH) |
+    38f4:	49 f5       	brne	.+82     	; 0x3948 <clchk+0xbc>
+    38f6:	66 e2       	ldi	r22, 0x26	; 38
+    38f8:	86 e0       	ldi	r24, 0x06	; 6
+			(1 << RF_DR_LOW));
+	/* Dynamic payload length for TX & RX (pipes 0 and 1) */
+	nrf24_write_reg(DYNPD, 0x03);
+    38fa:	34 d1       	rcall	.+616    	; 0x3b64 <nrf24_write_reg>
+    38fc:	63 e0       	ldi	r22, 0x03	; 3
+    38fe:	8c e1       	ldi	r24, 0x1C	; 28
+	nrf24_write_reg(FEATURE, 1 << EN_DPL);
+    3900:	31 d1       	rcall	.+610    	; 0x3b64 <nrf24_write_reg>
+    3902:	64 e0       	ldi	r22, 0x04	; 4
+    3904:	8d e1       	ldi	r24, 0x1D	; 29
+	/* Reset status bits */
+	nrf24_write_reg(STATUS, (1 << RX_DR) | (1 << TX_DS) | (1 << MAX_RT));
+    3906:	2e d1       	rcall	.+604    	; 0x3b64 <nrf24_write_reg>
+    3908:	60 e7       	ldi	r22, 0x70	; 112
+    390a:	87 e0       	ldi	r24, 0x07	; 7
+    390c:	2b d1       	rcall	.+598    	; 0x3b64 <nrf24_write_reg>
+	/* Set some RF channel number */
+	nrf24_write_reg(RF_CH, 42);
+    390e:	6a e2       	ldi	r22, 0x2A	; 42
+    3910:	85 e0       	ldi	r24, 0x05	; 5
+    3912:	28 d1       	rcall	.+592    	; 0x3b64 <nrf24_write_reg>
+	/* 3-byte addresses */
+	nrf24_write_reg(SETUP_AW, 0x01);
+    3914:	61 e0       	ldi	r22, 0x01	; 1
+    3916:	83 e0       	ldi	r24, 0x03	; 3
+    3918:	25 d1       	rcall	.+586    	; 0x3b64 <nrf24_write_reg>
+	/* Enable ACKing on both pipe 0 & 1 for TX & RX ACK support */
+	nrf24_write_reg(EN_AA, 0x03);
+    391a:	63 e0       	ldi	r22, 0x03	; 3
+    391c:	81 e0       	ldi	r24, 0x01	; 1
+    391e:	22 d1       	rcall	.+580    	; 0x3b64 <nrf24_write_reg>
+  spi_init();
+
+  if (nrf24_init())
+    return;
+
+  radio_present = 1;
+    3920:	00 93 46 01 	sts	0x0146, r16	; 0x800146 <radio_present>
+   * Set our own address.
+   *
+   * The remote end's address will be set according to the contents
+   * of the first packet we receive from the master.
+   */
+  addr[0] = eeprom_read(0);
+    3924:	90 e0       	ldi	r25, 0x00	; 0
+    3926:	80 e0       	ldi	r24, 0x00	; 0
+    3928:	f0 d0       	rcall	.+480    	; 0x3b0a <eeprom_read>
+  addr[1] = eeprom_read(1);
+    392a:	89 83       	std	Y+1, r24	; 0x01
+    392c:	81 e0       	ldi	r24, 0x01	; 1
+    392e:	90 e0       	ldi	r25, 0x00	; 0
+    3930:	ec d0       	rcall	.+472    	; 0x3b0a <eeprom_read>
+    3932:	8a 83       	std	Y+2, r24	; 0x02
+  addr[2] = eeprom_read(2);
+    3934:	82 e0       	ldi	r24, 0x02	; 2
+    3936:	90 e0       	ldi	r25, 0x00	; 0
+    3938:	e8 d0       	rcall	.+464    	; 0x3b0a <eeprom_read>
+    393a:	8b 83       	std	Y+3, r24	; 0x03
+    393c:	be 01       	movw	r22, r28
+
+	return 0;
+}
+
+static void nrf24_set_rx_addr(uint8_t addr[3]) {
+	nrf24_write_addr_reg(RX_ADDR_P1, addr);
+    393e:	6f 5f       	subi	r22, 0xFF	; 255
+    3940:	7f 4f       	sbci	r23, 0xFF	; 255
+    3942:	8b e0       	ldi	r24, 0x0B	; 11
+    3944:	2b d1       	rcall	.+598    	; 0x3b9c <nrf24_write_addr_reg>
+    3946:	1b d1       	rcall	.+566    	; 0x3b7e <nrf24_rx_mode>
+    3948:	88 e1       	ldi	r24, 0x18	; 24
+  nrf24_set_rx_addr(addr);
+
+  nrf24_rx_mode();
+    394a:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+    "wdr\n"
+  );
+}
+
+void watchdogConfig(uint8_t x) {
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    394e:	8e e0       	ldi	r24, 0x0E	; 14
+  WDTCSR = x;
+    3950:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+  register uint16_t address = 0;
+    3954:	10 e0       	ldi	r17, 0x00	; 0
+    3956:	00 e0       	ldi	r16, 0x00	; 0
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    3958:	38 e1       	ldi	r19, 0x18	; 24
+    395a:	a3 2e       	mov	r10, r19
+  WDTCSR = x;
+    395c:	48 e0       	ldi	r20, 0x08	; 8
+    395e:	94 2e       	mov	r9, r20
+          __boot_page_fill_short((uint16_t)(void*)addrPtr,a);
+    3960:	88 24       	eor	r8, r8
+    3962:	83 94       	inc	r8
+        __boot_page_write_short((uint16_t)(void*)address);
+    3964:	55 e0       	ldi	r21, 0x05	; 5
+        boot_rww_enable();
+    3966:	55 2e       	mov	r5, r21
+        if (address >= NRWWSTART) __boot_page_erase_short((uint16_t)(void*)address);
+    3968:	61 e1       	ldi	r22, 0x11	; 17
+    396a:	46 2e       	mov	r4, r22
+    ch = getch();
+    396c:	73 e0       	ldi	r23, 0x03	; 3
+    if(ch == STK_GET_PARAMETER) {
+    396e:	b7 2e       	mov	r11, r23
+    3970:	b2 d1       	rcall	.+868    	; 0x3cd6 <getch>
+      unsigned char which = getch();
+    3972:	81 34       	cpi	r24, 0x41	; 65
+    3974:	81 f4       	brne	.+32     	; 0x3996 <clchk+0x10a>
+    3976:	af d1       	rcall	.+862    	; 0x3cd6 <getch>
+      verifySpace();
+    3978:	f8 2e       	mov	r15, r24
+    397a:	56 d2       	rcall	.+1196   	; 0x3e28 <verifySpace>
+      if (which == 0x82) {
+    397c:	82 e8       	ldi	r24, 0x82	; 130
+    397e:	f8 12       	cpse	r15, r24
+      putch(0x00);
+    3980:	02 c0       	rjmp	.+4      	; 0x3986 <clchk+0xfa>
+      } else if (which == 0x81) {
+    3982:	80 e0       	ldi	r24, 0x00	; 0
+	  putch(OPTIBOOT_MAJVER);
+    3984:	04 c0       	rjmp	.+8      	; 0x398e <clchk+0x102>
+	putch(0x03);
+    3986:	91 e8       	ldi	r25, 0x81	; 129
+    3988:	85 e0       	ldi	r24, 0x05	; 5
+    398a:	f9 12       	cpse	r15, r25
+    putch(STK_OK);
+    398c:	83 e0       	ldi	r24, 0x03	; 3
+    398e:	19 d1       	rcall	.+562    	; 0x3bc2 <putch>
+    ch = getch();
+    3990:	80 e1       	ldi	r24, 0x10	; 16
+    else if(ch == STK_SET_DEVICE) {
+    3992:	17 d1       	rcall	.+558    	; 0x3bc2 <putch>
+    3994:	ed cf       	rjmp	.-38     	; 0x3970 <clchk+0xe4>
+      getNch(5);
+    3996:	82 34       	cpi	r24, 0x42	; 66
+    3998:	19 f4       	brne	.+6      	; 0x39a0 <clchk+0x114>
+    else if(ch == STK_SET_DEVICE_EXT) {
+    399a:	84 e1       	ldi	r24, 0x14	; 20
+    399c:	4b d2       	rcall	.+1174   	; 0x3e34 <getNch>
+      getNch(5);
+    399e:	f8 cf       	rjmp	.-16     	; 0x3990 <clchk+0x104>
+    39a0:	85 34       	cpi	r24, 0x45	; 69
+    else if(ch == STK_LOAD_ADDRESS) {
+    39a2:	11 f4       	brne	.+4      	; 0x39a8 <clchk+0x11c>
+    39a4:	85 e0       	ldi	r24, 0x05	; 5
+      newAddress = getch();
+    39a6:	fa cf       	rjmp	.-12     	; 0x399c <clchk+0x110>
+    39a8:	85 35       	cpi	r24, 0x55	; 85
+    39aa:	49 f4       	brne	.+18     	; 0x39be <clchk+0x132>
+    39ac:	94 d1       	rcall	.+808    	; 0x3cd6 <getch>
+      newAddress |= getch() << 8;
+    39ae:	08 2f       	mov	r16, r24
+    39b0:	10 e0       	ldi	r17, 0x00	; 0
+    39b2:	91 d1       	rcall	.+802    	; 0x3cd6 <getch>
+      newAddress <<= 1; // Convert from word address to byte address
+    39b4:	18 2b       	or	r17, r24
+    39b6:	00 0f       	add	r16, r16
+      verifySpace();
+    39b8:	11 1f       	adc	r17, r17
+    39ba:	36 d2       	rcall	.+1132   	; 0x3e28 <verifySpace>
+    39bc:	e9 cf       	rjmp	.-46     	; 0x3990 <clchk+0x104>
+    else if(ch == STK_UNIVERSAL) {
+    39be:	86 35       	cpi	r24, 0x56	; 86
+    39c0:	19 f4       	brne	.+6      	; 0x39c8 <clchk+0x13c>
+      getNch(4);
+    39c2:	84 e0       	ldi	r24, 0x04	; 4
+    39c4:	37 d2       	rcall	.+1134   	; 0x3e34 <getNch>
+    39c6:	dd cf       	rjmp	.-70     	; 0x3982 <clchk+0xf6>
+    else if(ch == STK_PROG_PAGE) {
+    39c8:	84 36       	cpi	r24, 0x64	; 100
+    39ca:	09 f0       	breq	.+2      	; 0x39ce <clchk+0x142>
+    39cc:	67 c0       	rjmp	.+206    	; 0x3a9c <clchk+0x210>
+      getch();			/* getlen() */
+    39ce:	83 d1       	rcall	.+774    	; 0x3cd6 <getch>
+    39d0:	82 d1       	rcall	.+772    	; 0x3cd6 <getch>
+      length = getch();
+    39d2:	e8 2e       	mov	r14, r24
+    39d4:	80 d1       	rcall	.+768    	; 0x3cd6 <getch>
+    39d6:	38 2e       	mov	r3, r24
+      type = getch();
+    39d8:	e6 e4       	ldi	r30, 0x46	; 70
+    39da:	8e 13       	cpse	r24, r30
+    39dc:	07 c0       	rjmp	.+14     	; 0x39ec <clchk+0x160>
+      if (type == 'F')		/* Flash */
+    39de:	01 15       	cp	r16, r1
+    39e0:	f8 e3       	ldi	r31, 0x38	; 56
+    39e2:	1f 07       	cpc	r17, r31
+        if (address < NRWWSTART) __boot_page_erase_short((uint16_t)(void*)address);
+    39e4:	18 f4       	brcc	.+6      	; 0x39ec <clchk+0x160>
+    39e6:	f8 01       	movw	r30, r16
+    39e8:	b7 be       	out	0x37, r11	; 55
+    39ea:	e8 95       	spm
+    39ec:	80 e8       	ldi	r24, 0x80	; 128
+    39ee:	c8 2e       	mov	r12, r24
+    39f0:	dd 24       	eor	r13, r13
+    39f2:	d3 94       	inc	r13
+    39f4:	90 e8       	ldi	r25, 0x80	; 128
+    39f6:	f9 2e       	mov	r15, r25
+      while (--length);
+    39f8:	fe 0c       	add	r15, r14
+    39fa:	36 01       	movw	r6, r12
+    39fc:	ff ef       	ldi	r31, 0xFF	; 255
+      do *bufPtr++ = getch();
+    39fe:	cf 1a       	sub	r12, r31
+    3a00:	df 0a       	sbc	r13, r31
+    3a02:	69 d1       	rcall	.+722    	; 0x3cd6 <getch>
+    3a04:	f3 01       	movw	r30, r6
+    3a06:	80 83       	st	Z, r24
+    3a08:	fc 10       	cpse	r15, r12
+    3a0a:	f7 cf       	rjmp	.-18     	; 0x39fa <clchk+0x16e>
+    3a0c:	ea 94       	dec	r14
+      while (--length);
+    3a0e:	f1 2c       	mov	r15, r1
+    3a10:	f6 e4       	ldi	r31, 0x46	; 70
+      do *bufPtr++ = getch();
+    3a12:	3f 12       	cpse	r3, r31
+    3a14:	24 c0       	rjmp	.+72     	; 0x3a5e <clchk+0x1d2>
+      if (type == 'F') {	/* Flash */
+    3a16:	01 15       	cp	r16, r1
+    3a18:	28 e3       	ldi	r18, 0x38	; 56
+    3a1a:	12 07       	cpc	r17, r18
+        if (address >= NRWWSTART) __boot_page_erase_short((uint16_t)(void*)address);
+    3a1c:	18 f0       	brcs	.+6      	; 0x3a24 <clchk+0x198>
+    3a1e:	f8 01       	movw	r30, r16
+    3a20:	b7 be       	out	0x37, r11	; 55
+    3a22:	e8 95       	spm
+    3a24:	01 d2       	rcall	.+1026   	; 0x3e28 <verifySpace>
+    3a26:	07 b6       	in	r0, 0x37	; 55
+        verifySpace();
+    3a28:	00 fc       	sbrc	r0, 0
+    3a2a:	fd cf       	rjmp	.-6      	; 0x3a26 <clchk+0x19a>
+        boot_spm_busy_wait();
+    3a2c:	f8 01       	movw	r30, r16
+    3a2e:	80 e8       	ldi	r24, 0x80	; 128
+    3a30:	91 e0       	ldi	r25, 0x01	; 1
+    3a32:	dc 01       	movw	r26, r24
+        bufPtr = buff;
+    3a34:	2d 91       	ld	r18, X+
+    3a36:	3c 91       	ld	r19, X
+          a |= (*bufPtr++) << 8;
+    3a38:	11 97       	sbiw	r26, 0x01	; 1
+          __boot_page_fill_short((uint16_t)(void*)addrPtr,a);
+    3a3a:	02 96       	adiw	r24, 0x02	; 2
+    3a3c:	09 01       	movw	r0, r18
+    3a3e:	87 be       	out	0x37, r8	; 55
+    3a40:	e8 95       	spm
+    3a42:	11 24       	eor	r1, r1
+    3a44:	32 96       	adiw	r30, 0x02	; 2
+    3a46:	ae 3f       	cpi	r26, 0xFE	; 254
+    3a48:	b1 40       	sbci	r27, 0x01	; 1
+          addrPtr += 2;
+    3a4a:	99 f7       	brne	.-26     	; 0x3a32 <clchk+0x1a6>
+        } while (--ch);
+    3a4c:	f8 01       	movw	r30, r16
+    3a4e:	57 be       	out	0x37, r5	; 55
+    3a50:	e8 95       	spm
+        __boot_page_write_short((uint16_t)(void*)address);
+    3a52:	07 b6       	in	r0, 0x37	; 55
+    3a54:	00 fc       	sbrc	r0, 0
+    3a56:	fd cf       	rjmp	.-6      	; 0x3a52 <clchk+0x1c6>
+        boot_spm_busy_wait();
+    3a58:	47 be       	out	0x37, r4	; 55
+    3a5a:	e8 95       	spm
+    3a5c:	99 cf       	rjmp	.-206    	; 0x3990 <clchk+0x104>
+        boot_rww_enable();
+    3a5e:	f5 e4       	ldi	r31, 0x45	; 69
+      } else if (type == 'E') {	/* EEPROM */
+    3a60:	3f 12       	cpse	r3, r31
+    3a62:	96 cf       	rjmp	.-212    	; 0x3990 <clchk+0x104>
+        verifySpace();
+    3a64:	e1 d1       	rcall	.+962    	; 0x3e28 <verifySpace>
+    3a66:	2f ef       	ldi	r18, 0xFF	; 255
+        length = bufPtr - buff;
+    3a68:	e2 1a       	sub	r14, r18
+    3a6a:	f2 0a       	sbc	r15, r18
+    3a6c:	ff 24       	eor	r15, r15
+    3a6e:	90 e0       	ldi	r25, 0x00	; 0
+        while (length--) {
+    3a70:	80 e0       	ldi	r24, 0x00	; 0
+    3a72:	fc 01       	movw	r30, r24
+    3a74:	e0 58       	subi	r30, 0x80	; 128
+    3a76:	fe 4f       	sbci	r31, 0xFE	; 254
+    3a78:	98 01       	movw	r18, r16
+    3a7a:	28 0f       	add	r18, r24
+    3a7c:	39 1f       	adc	r19, r25
+    3a7e:	8e 15       	cp	r24, r14
+    3a80:	9f 05       	cpc	r25, r15
+    3a82:	09 f4       	brne	.+2      	; 0x3a86 <clchk+0x1fa>
+    3a84:	85 cf       	rjmp	.-246    	; 0x3990 <clchk+0x104>
+  __asm__ __volatile__ (
+    3a86:	a8 95       	wdr
+          eeprom_write(addrPtr++, *bufPtr++);
+    3a88:	40 81       	ld	r20, Z
+  while (!eeprom_is_ready());
+    3a8a:	f9 99       	sbic	0x1f, 1	; 31
+    3a8c:	fe cf       	rjmp	.-4      	; 0x3a8a <clchk+0x1fe>
+  EEAR = addr;
+    3a8e:	32 bd       	out	0x22, r19	; 34
+  EEDR = val;
+    3a90:	21 bd       	out	0x21, r18	; 33
+  EECR |= 1 << EEMPE;	/* Write logical one to EEMPE */
+    3a92:	40 bd       	out	0x20, r20	; 32
+  EECR |= 1 << EEPE;	/* Start eeprom write by setting EEPE */
+    3a94:	fa 9a       	sbi	0x1f, 2	; 31
+    3a96:	f9 9a       	sbi	0x1f, 1	; 31
+}
+    3a98:	01 96       	adiw	r24, 0x01	; 1
+    else if(ch == STK_READ_PAGE) {
+    3a9a:	eb cf       	rjmp	.-42     	; 0x3a72 <clchk+0x1e6>
+    3a9c:	84 37       	cpi	r24, 0x74	; 116
+      getch();			/* getlen() */
+    3a9e:	21 f5       	brne	.+72     	; 0x3ae8 <clchk+0x25c>
+      length = getch();
+    3aa0:	1a d1       	rcall	.+564    	; 0x3cd6 <getch>
+    3aa2:	19 d1       	rcall	.+562    	; 0x3cd6 <getch>
+      type = getch();
+    3aa4:	d8 2e       	mov	r13, r24
+    3aa6:	17 d1       	rcall	.+558    	; 0x3cd6 <getch>
+      verifySpace();
+    3aa8:	f8 2e       	mov	r15, r24
+    3aaa:	be d1       	rcall	.+892    	; 0x3e28 <verifySpace>
+      if (type == 'F')
+    3aac:	86 e4       	ldi	r24, 0x46	; 70
+    3aae:	f8 12       	cpse	r15, r24
+    3ab0:	08 c0       	rjmp	.+16     	; 0x3ac2 <clchk+0x236>
+          __asm__ ("lpm %0,Z+\n" : "=r" (ch), "=z" (address): "1" (address));
+    3ab2:	f8 01       	movw	r30, r16
+    3ab4:	85 91       	lpm	r24, Z+
+    3ab6:	8f 01       	movw	r16, r30
+          putch(ch);
+    3ab8:	84 d0       	rcall	.+264    	; 0x3bc2 <putch>
+    3aba:	da 94       	dec	r13
+        } while (--length);
+    3abc:	d1 10       	cpse	r13, r1
+    3abe:	f9 cf       	rjmp	.-14     	; 0x3ab2 <clchk+0x226>
+    3ac0:	67 cf       	rjmp	.-306    	; 0x3990 <clchk+0x104>
+    3ac2:	95 e4       	ldi	r25, 0x45	; 69
+      else if (type == 'E')
+    3ac4:	f9 12       	cpse	r15, r25
+    3ac6:	64 cf       	rjmp	.-312    	; 0x3990 <clchk+0x104>
+    3ac8:	c8 01       	movw	r24, r16
+    3aca:	cd 2c       	mov	r12, r13
+        while (length--)
+    3acc:	c0 0e       	add	r12, r16
+    3ace:	07 c0       	rjmp	.+14     	; 0x3ade <clchk+0x252>
+    3ad0:	7c 01       	movw	r14, r24
+          putch(eeprom_read(address++));
+    3ad2:	ef ef       	ldi	r30, 0xFF	; 255
+    3ad4:	ee 1a       	sub	r14, r30
+    3ad6:	fe 0a       	sbc	r15, r30
+    3ad8:	18 d0       	rcall	.+48     	; 0x3b0a <eeprom_read>
+    3ada:	73 d0       	rcall	.+230    	; 0x3bc2 <putch>
+    3adc:	c7 01       	movw	r24, r14
+    3ade:	c8 12       	cpse	r12, r24
+    3ae0:	f7 cf       	rjmp	.-18     	; 0x3ad0 <clchk+0x244>
+    3ae2:	0d 0d       	add	r16, r13
+        while (length--)
+    3ae4:	11 1d       	adc	r17, r1
+    3ae6:	54 cf       	rjmp	.-344    	; 0x3990 <clchk+0x104>
+    3ae8:	85 37       	cpi	r24, 0x75	; 117
+    3aea:	39 f4       	brne	.+14     	; 0x3afa <clchk+0x26e>
+    3aec:	9d d1       	rcall	.+826    	; 0x3e28 <verifySpace>
+    else if(ch == STK_READ_SIGN) {
+    3aee:	8e e1       	ldi	r24, 0x1E	; 30
+    3af0:	68 d0       	rcall	.+208    	; 0x3bc2 <putch>
+      verifySpace();
+    3af2:	84 e9       	ldi	r24, 0x94	; 148
+    3af4:	66 d0       	rcall	.+204    	; 0x3bc2 <putch>
+      putch(SIGNATURE_0);
+    3af6:	86 e0       	ldi	r24, 0x06	; 6
+    3af8:	4a cf       	rjmp	.-364    	; 0x398e <clchk+0x102>
+    3afa:	81 35       	cpi	r24, 0x51	; 81
+      putch(SIGNATURE_1);
+    3afc:	09 f0       	breq	.+2      	; 0x3b00 <clchk+0x274>
+    3afe:	5d cf       	rjmp	.-326    	; 0x39ba <clchk+0x12e>
+    3b00:	a0 92 60 00 	sts	0x0060, r10	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+      putch(SIGNATURE_2);
+    3b04:	90 92 60 00 	sts	0x0060, r9	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+    else if (ch == STK_LEAVE_PROGMODE) { /* 'Q' */
+    3b08:	58 cf       	rjmp	.-336    	; 0x39ba <clchk+0x12e>
+
+00003b0a <eeprom_read>:
+    3b0a:	f9 99       	sbic	0x1f, 1	; 31
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    3b0c:	fe cf       	rjmp	.-4      	; 0x3b0a <eeprom_read>
+    3b0e:	92 bd       	out	0x22, r25	; 34
+  WDTCSR = x;
+    3b10:	81 bd       	out	0x21, r24	; 33
+    3b12:	f8 9a       	sbi	0x1f, 0	; 31
+      verifySpace();
+    3b14:	80 b5       	in	r24, 0x20	; 32
+}
+    3b16:	08 95       	ret
+
+00003b18 <spi_transfer>:
+	spi_mode(0);
+}
+
+static uint8_t spi_transfer(uint8_t value) {
+	uint8_t cnt = 0xff;
+	SPDR = value;
+    3b18:	8e bd       	out	0x2e, r24	; 46
+    3b1a:	8f ef       	ldi	r24, 0xFF	; 255
+	while (cnt -- && !(SPSR & (1 << SPIF)));
+    3b1c:	81 50       	subi	r24, 0x01	; 1
+    3b1e:	0d b4       	in	r0, 0x2d	; 45
+    3b20:	07 fc       	sbrc	r0, 7
+    3b22:	02 c0       	rjmp	.+4      	; 0x3b28 <spi_transfer+0x10>
+    3b24:	81 11       	cpse	r24, r1
+    3b26:	fa cf       	rjmp	.-12     	; 0x3b1c <spi_transfer+0x4>
+	return SPDR;
+    3b28:	8e b5       	in	r24, 0x2e	; 46
+}
+    3b2a:	08 95       	ret
+
+00003b2c <delay8>:
+	while (count --)
+    3b2c:	01 97       	sbiw	r24, 0x01	; 1
+    3b2e:	08 f4       	brcc	.+2      	; 0x3b32 <delay8+0x6>
+}
+    3b30:	08 95       	ret
+	...
+		__asm__ __volatile__ (
+    3b3e:	00 00       	nop
+    3b40:	a8 95       	wdr
+    3b42:	f4 cf       	rjmp	.-24     	; 0x3b2c <delay8>
+
+00003b44 <nrf24_csn.part.0>:
+		CSN_PORT |= CSN_PIN;
+    3b44:	2a 9a       	sbi	0x05, 2	; 5
+}
+    3b46:	08 95       	ret
+
+00003b48 <nrf24_ce>:
+	if (level)
+    3b48:	88 23       	and	r24, r24
+    3b4a:	29 f0       	breq	.+10     	; 0x3b56 <nrf24_ce+0xe>
+		my_delay(0.01);
+    3b4c:	8a e0       	ldi	r24, 0x0A	; 10
+    3b4e:	90 e0       	ldi	r25, 0x00	; 0
+    3b50:	ed df       	rcall	.-38     	; 0x3b2c <delay8>
+		CE_PORT |= CE_PIN;
+    3b52:	29 9a       	sbi	0x05, 1	; 5
+}
+    3b54:	08 95       	ret
+		my_delay(0.2);
+    3b56:	88 ec       	ldi	r24, 0xC8	; 200
+    3b58:	90 e0       	ldi	r25, 0x00	; 0
+    3b5a:	e8 df       	rcall	.-48     	; 0x3b2c <delay8>
+		CE_PORT &= ~CE_PIN;
+    3b5c:	29 98       	cbi	0x05, 1	; 5
+}
+    3b5e:	08 95       	ret
+
+00003b60 <nrf24_csn.constprop.0>:
+		CSN_PORT &= ~CSN_PIN;
+    3b60:	2a 98       	cbi	0x05, 2	; 5
+}
+    3b62:	08 95       	ret
+
+00003b64 <nrf24_write_reg>:
+static void nrf24_write_reg(uint8_t addr, uint8_t value) {
+    3b64:	cf 93       	push	r28
+    3b66:	df 93       	push	r29
+    3b68:	d8 2f       	mov	r29, r24
+	nrf24_csn(0);
+    3b6a:	c6 2f       	mov	r28, r22
+	spi_transfer(addr | W_REGISTER);
+    3b6c:	f9 df       	rcall	.-14     	; 0x3b60 <nrf24_csn.constprop.0>
+    3b6e:	8d 2f       	mov	r24, r29
+    3b70:	80 62       	ori	r24, 0x20	; 32
+	spi_transfer(value);
+    3b72:	d2 df       	rcall	.-92     	; 0x3b18 <spi_transfer>
+    3b74:	8c 2f       	mov	r24, r28
+}
+    3b76:	d0 df       	rcall	.-96     	; 0x3b18 <spi_transfer>
+    3b78:	df 91       	pop	r29
+    3b7a:	cf 91       	pop	r28
+}
+
+static uint8_t nrf24_in_rx = 0;
+
+static void nrf24_rx_mode(void) {
+	if (nrf24_in_rx)
+    3b7c:	e3 cf       	rjmp	.-58     	; 0x3b44 <nrf24_csn.part.0>
+
+00003b7e <nrf24_rx_mode>:
+    3b7e:	80 91 45 01 	lds	r24, 0x0145	; 0x800145 <nrf24_in_rx>
+		return;
+
+	/* Rx mode */
+	nrf24_write_reg(CONFIG, CONFIG_VAL | (1 << PWR_UP) | (1 << PRIM_RX));
+    3b82:	81 11       	cpse	r24, r1
+    3b84:	0a c0       	rjmp	.+20     	; 0x3b9a <nrf24_rx_mode+0x1c>
+	/* Only use data pipe 1 for receiving, pipe 0 is for TX ACKs */
+	nrf24_write_reg(EN_RXADDR, 0x02);
+    3b86:	6f e7       	ldi	r22, 0x7F	; 127
+    3b88:	ed df       	rcall	.-38     	; 0x3b64 <nrf24_write_reg>
+    3b8a:	62 e0       	ldi	r22, 0x02	; 2
+    3b8c:	82 e0       	ldi	r24, 0x02	; 2
+
+	nrf24_ce(1);
+    3b8e:	ea df       	rcall	.-44     	; 0x3b64 <nrf24_write_reg>
+    3b90:	81 e0       	ldi	r24, 0x01	; 1
+    3b92:	da df       	rcall	.-76     	; 0x3b48 <nrf24_ce>
+
+	nrf24_in_rx = 1;
+    3b94:	81 e0       	ldi	r24, 0x01	; 1
+    3b96:	80 93 45 01 	sts	0x0145, r24	; 0x800145 <nrf24_in_rx>
+static void nrf24_write_addr_reg(uint8_t addr, uint8_t value[3]) {
+    3b9a:	08 95       	ret
+
+00003b9c <nrf24_write_addr_reg>:
+    3b9c:	1f 93       	push	r17
+	nrf24_csn(0);
+    3b9e:	cf 93       	push	r28
+	spi_transfer(addr | W_REGISTER);
+    3ba0:	df 93       	push	r29
+    3ba2:	18 2f       	mov	r17, r24
+    3ba4:	eb 01       	movw	r28, r22
+	spi_transfer(value[0]);
+    3ba6:	dc df       	rcall	.-72     	; 0x3b60 <nrf24_csn.constprop.0>
+    3ba8:	81 2f       	mov	r24, r17
+    3baa:	80 62       	ori	r24, 0x20	; 32
+	spi_transfer(value[1]);
+    3bac:	b5 df       	rcall	.-150    	; 0x3b18 <spi_transfer>
+    3bae:	88 81       	ld	r24, Y
+    3bb0:	b3 df       	rcall	.-154    	; 0x3b18 <spi_transfer>
+	spi_transfer(value[2]);
+    3bb2:	89 81       	ldd	r24, Y+1	; 0x01
+    3bb4:	b1 df       	rcall	.-158    	; 0x3b18 <spi_transfer>
+    3bb6:	8a 81       	ldd	r24, Y+2	; 0x02
+}
+    3bb8:	af df       	rcall	.-162    	; 0x3b18 <spi_transfer>
+    3bba:	df 91       	pop	r29
+    3bbc:	cf 91       	pop	r28
+    3bbe:	1f 91       	pop	r17
+    3bc0:	c1 cf       	rjmp	.-126    	; 0x3b44 <nrf24_csn.part.0>
+
+00003bc2 <putch>:
+void putch(char ch) {
+    3bc2:	df 92       	push	r13
+    3bc4:	ef 92       	push	r14
+    3bc6:	ff 92       	push	r15
+    3bc8:	0f 93       	push	r16
+    3bca:	1f 93       	push	r17
+    3bcc:	cf 93       	push	r28
+    3bce:	df 93       	push	r29
+  if (radio_mode) {
+    3bd0:	90 91 47 01 	lds	r25, 0x0147	; 0x800147 <radio_mode>
+    3bd4:	99 23       	and	r25, r25
+    3bd6:	09 f4       	brne	.+2      	; 0x3bda <putch+0x18>
+    3bd8:	77 c0       	rjmp	.+238    	; 0x3cc8 <putch+0x106>
+    pkt_buf[pkt_len++] = ch;
+    3bda:	e0 91 44 01 	lds	r30, 0x0144	; 0x800144 <pkt_len.5>
+    3bde:	01 e0       	ldi	r16, 0x01	; 1
+    3be0:	0e 0f       	add	r16, r30
+    3be2:	00 93 44 01 	sts	0x0144, r16	; 0x800144 <pkt_len.5>
+    3be6:	f0 e0       	ldi	r31, 0x00	; 0
+    3be8:	ec 5d       	subi	r30, 0xDC	; 220
+    3bea:	fe 4f       	sbci	r31, 0xFE	; 254
+    if (ch == STK_OK || pkt_len == pkt_max_len) {
+    3bec:	80 83       	st	Z, r24
+    3bee:	80 31       	cpi	r24, 0x10	; 16
+    3bf0:	21 f0       	breq	.+8      	; 0x3bfa <putch+0x38>
+    3bf2:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <pkt_max_len>
+    3bf6:	08 13       	cpse	r16, r24
+	 * in Rx which we'll switch back on when this Tx is done.
+	 */
+	if (nrf24_in_rx) {
+		nrf24_idle_mode(1);
+
+		nrf24_in_rx = 1;
+    3bf8:	52 c0       	rjmp	.+164    	; 0x3c9e <putch+0xdc>
+    3bfa:	10 e8       	ldi	r17, 0x80	; 128
+      while (--cnt) {
+    3bfc:	dd 24       	eor	r13, r13
+    3bfe:	d3 94       	inc	r13
+        my_delay(4);
+    3c00:	11 50       	subi	r17, 0x01	; 1
+    3c02:	09 f4       	brne	.+2      	; 0x3c06 <putch+0x44>
+	if (nrf24_in_rx) {
+    3c04:	44 c0       	rjmp	.+136    	; 0x3c8e <putch+0xcc>
+    3c06:	80 ea       	ldi	r24, 0xA0	; 160
+		nrf24_ce(0);
+    3c08:	9f e0       	ldi	r25, 0x0F	; 15
+    3c0a:	90 df       	rcall	.-224    	; 0x3b2c <delay8>
+		nrf24_in_rx = 1;
+    3c0c:	80 91 45 01 	lds	r24, 0x0145	; 0x800145 <nrf24_in_rx>
+	}
+
+	/* Tx mode */
+	nrf24_write_reg(CONFIG, CONFIG_VAL | (1 << PWR_UP));
+    3c10:	88 23       	and	r24, r24
+    3c12:	21 f0       	breq	.+8      	; 0x3c1c <putch+0x5a>
+    3c14:	80 e0       	ldi	r24, 0x00	; 0
+	/* Use pipe 0 for receiving ACK packets */
+	nrf24_write_reg(EN_RXADDR, 0x01);
+    3c16:	98 df       	rcall	.-208    	; 0x3b48 <nrf24_ce>
+    3c18:	d0 92 45 01 	sts	0x0145, r13	; 0x800145 <nrf24_in_rx>
+	ret = spi_transfer(FLUSH_TX);
+    3c1c:	6e e7       	ldi	r22, 0x7E	; 126
+    3c1e:	80 e0       	ldi	r24, 0x00	; 0
+	if (level)
+    3c20:	a1 df       	rcall	.-190    	; 0x3b64 <nrf24_write_reg>
+    3c22:	61 e0       	ldi	r22, 0x01	; 1
+	 * it picks up whatever the new payload is and again stops accepting
+	 * new payloads for another while.
+	 */
+	nrf24_tx_flush();
+
+	nrf24_csn(0);
+    3c24:	82 e0       	ldi	r24, 0x02	; 2
+    3c26:	9e df       	rcall	.-196    	; 0x3b64 <nrf24_write_reg>
+
+	spi_transfer(W_TX_PAYLOAD);
+    3c28:	9b df       	rcall	.-202    	; 0x3b60 <nrf24_csn.constprop.0>
+    3c2a:	81 ee       	ldi	r24, 0xE1	; 225
+    3c2c:	75 df       	rcall	.-278    	; 0x3b18 <spi_transfer>
+    pkt_buf[pkt_len++] = ch;
+    3c2e:	8a df       	rcall	.-236    	; 0x3b44 <nrf24_csn.part.0>
+	while (len --)
+    3c30:	97 df       	rcall	.-210    	; 0x3b60 <nrf24_csn.constprop.0>
+    3c32:	80 ea       	ldi	r24, 0xA0	; 160
+    3c34:	71 df       	rcall	.-286    	; 0x3b18 <spi_transfer>
+    3c36:	f0 2e       	mov	r15, r16
+	if (level)
+    3c38:	c4 e2       	ldi	r28, 0x24	; 36
+    3c3a:	d1 e0       	ldi	r29, 0x01	; 1
+
+	/*
+	 * Set CE high for at least 10us - that's 160 cycles at 16MHz.
+	 * But we can also leave it that way until tx_result_wait().
+	 */
+	nrf24_ce(1);
+    3c3c:	f1 10       	cpse	r15, r1
+    3c3e:	37 c0       	rjmp	.+110    	; 0x3cae <putch+0xec>
+	nrf24_csn(0);
+    3c40:	81 df       	rcall	.-254    	; 0x3b44 <nrf24_csn.part.0>
+    3c42:	81 e0       	ldi	r24, 0x01	; 1
+	ret = spi_transfer(NOP);
+    3c44:	81 df       	rcall	.-254    	; 0x3b48 <nrf24_ce>
+    3c46:	8c df       	rcall	.-232    	; 0x3b60 <nrf24_csn.constprop.0>
+    3c48:	8f ef       	ldi	r24, 0xFF	; 255
+    3c4a:	66 df       	rcall	.-308    	; 0x3b18 <spi_transfer>
+	if (level)
+    3c4c:	c8 2f       	mov	r28, r24
+	uint16_t count = 10000; /* ~100ms timeout */
+
+	status = nrf24_read_status();
+
+	/* Reset CE early so that a new Tx or Rx op can start sooner. */
+	nrf24_ce(0);
+    3c4e:	7a df       	rcall	.-268    	; 0x3b44 <nrf24_csn.part.0>
+    3c50:	80 e0       	ldi	r24, 0x00	; 0
+    3c52:	7a df       	rcall	.-268    	; 0x3b48 <nrf24_ce>
+
+	while ((!(status & (1 << TX_DS)) || (status & (1 << TX_FULL))) &&
+    3c54:	80 e1       	ldi	r24, 0x10	; 16
+    3c56:	e8 2e       	mov	r14, r24
+    3c58:	87 e2       	ldi	r24, 0x27	; 39
+    3c5a:	f8 2e       	mov	r15, r24
+    3c5c:	dc 2f       	mov	r29, r28
+    3c5e:	d0 72       	andi	r29, 0x20	; 32
+    3c60:	c5 ff       	sbrs	r28, 5
+    3c62:	02 c0       	rjmp	.+4      	; 0x3c68 <putch+0xa6>
+    3c64:	c0 ff       	sbrs	r28, 0
+    3c66:	06 c0       	rjmp	.+12     	; 0x3c74 <putch+0xb2>
+    3c68:	c4 fd       	sbrc	r28, 4
+    3c6a:	04 c0       	rjmp	.+8      	; 0x3c74 <putch+0xb2>
+			!(status & (1 << MAX_RT)) && --count) {
+    3c6c:	81 e0       	ldi	r24, 0x01	; 1
+    3c6e:	e8 1a       	sub	r14, r24
+    3c70:	f1 08       	sbc	r15, r1
+    3c72:	09 f5       	brne	.+66     	; 0x3cb6 <putch+0xf4>
+		delay8((int) (F_CPU / 8000L * 0.01));
+		status = nrf24_read_status();
+	}
+
+	/* Reset status bits */
+	nrf24_write_reg(STATUS, (1 << MAX_RT) | (1 << TX_DS));
+    3c74:	60 e3       	ldi	r22, 0x30	; 48
+    3c76:	87 e0       	ldi	r24, 0x07	; 7
+    3c78:	75 df       	rcall	.-278    	; 0x3b64 <nrf24_write_reg>
+
+	if (nrf24_in_rx) {
+    3c7a:	80 91 45 01 	lds	r24, 0x0145	; 0x800145 <nrf24_in_rx>
+		nrf24_in_rx = 0;
+    3c7e:	88 23       	and	r24, r24
+
+		nrf24_rx_mode();
+    3c80:	19 f0       	breq	.+6      	; 0x3c88 <putch+0xc6>
+	}
+
+	return (status & (1 << TX_DS)) ? 0 : -1;
+    3c82:	10 92 45 01 	sts	0x0145, r1	; 0x800145 <nrf24_in_rx>
+    3c86:	7b df       	rcall	.-266    	; 0x3b7e <nrf24_rx_mode>
+      pkt_len = 1;
+    3c88:	dd 23       	and	r29, r29
+    3c8a:	09 f4       	brne	.+2      	; 0x3c8e <putch+0xcc>
+    3c8c:	b9 cf       	rjmp	.-142    	; 0x3c00 <putch+0x3e>
+      pkt_buf[0] ++;
+    3c8e:	81 e0       	ldi	r24, 0x01	; 1
+    3c90:	80 93 44 01 	sts	0x0144, r24	; 0x800144 <pkt_len.5>
+    3c94:	80 91 24 01 	lds	r24, 0x0124	; 0x800124 <pkt_buf.4>
+}
+    3c98:	8f 5f       	subi	r24, 0xFF	; 255
+    3c9a:	80 93 24 01 	sts	0x0124, r24	; 0x800124 <pkt_buf.4>
+    3c9e:	df 91       	pop	r29
+    3ca0:	cf 91       	pop	r28
+    3ca2:	1f 91       	pop	r17
+    3ca4:	0f 91       	pop	r16
+    3ca6:	ff 90       	pop	r15
+		spi_transfer(*buf ++);
+    3ca8:	ef 90       	pop	r14
+    3caa:	df 90       	pop	r13
+    3cac:	08 95       	ret
+    3cae:	89 91       	ld	r24, Y+
+    3cb0:	33 df       	rcall	.-410    	; 0x3b18 <spi_transfer>
+		delay8((int) (F_CPU / 8000L * 0.01));
+    3cb2:	fa 94       	dec	r15
+    3cb4:	c3 cf       	rjmp	.-122    	; 0x3c3c <putch+0x7a>
+    3cb6:	8a e0       	ldi	r24, 0x0A	; 10
+    3cb8:	90 e0       	ldi	r25, 0x00	; 0
+	nrf24_csn(0);
+    3cba:	38 df       	rcall	.-400    	; 0x3b2c <delay8>
+    3cbc:	51 df       	rcall	.-350    	; 0x3b60 <nrf24_csn.constprop.0>
+	ret = spi_transfer(NOP);
+    3cbe:	8f ef       	ldi	r24, 0xFF	; 255
+    3cc0:	2b df       	rcall	.-426    	; 0x3b18 <spi_transfer>
+    3cc2:	c8 2f       	mov	r28, r24
+    3cc4:	3f df       	rcall	.-386    	; 0x3b44 <nrf24_csn.part.0>
+	if (level)
+    3cc6:	ca cf       	rjmp	.-108    	; 0x3c5c <putch+0x9a>
+    3cc8:	90 91 c0 00 	lds	r25, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7e00c0>
+  while (!(UART_SRA & _BV(UDRE0)));
+    3ccc:	95 ff       	sbrs	r25, 5
+    3cce:	fc cf       	rjmp	.-8      	; 0x3cc8 <putch+0x106>
+    3cd0:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+  UART_UDR = ch;
+    3cd4:	e4 cf       	rjmp	.-56     	; 0x3c9e <putch+0xdc>
+
+00003cd6 <getch>:
+    3cd6:	df 92       	push	r13
+    3cd8:	ef 92       	push	r14
+uint8_t getch(void) {
+    3cda:	ff 92       	push	r15
+    3cdc:	0f 93       	push	r16
+    3cde:	1f 93       	push	r17
+    3ce0:	cf 93       	push	r28
+    3ce2:	df 93       	push	r29
+    3ce4:	83 e0       	ldi	r24, 0x03	; 3
+    3ce6:	e8 2e       	mov	r14, r24
+	while (len --)
+    3ce8:	81 e0       	ldi	r24, 0x01	; 1
+    3cea:	f8 2e       	mov	r15, r24
+    3cec:	01 e0       	ldi	r16, 0x01	; 1
+    3cee:	95 e0       	ldi	r25, 0x05	; 5
+        pkt_start = START;
+    3cf0:	d9 2e       	mov	r13, r25
+          pkt_start += 4;
+    3cf2:	80 91 46 01 	lds	r24, 0x0146	; 0x800146 <radio_present>
+    if (radio_present && (pkt_len || nrf24_rx_fifo_data())) {
+    3cf6:	90 91 c0 00 	lds	r25, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7e00c0>
+    if (UART_SRA & _BV(RXC0)) {
+    3cfa:	97 ff       	sbrs	r25, 7
+    3cfc:	0f c0       	rjmp	.+30     	; 0x3d1c <getch+0x46>
+    3cfe:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7e00c0>
+      if (!(UART_SRA & _BV(FE0))) {
+    3d02:	84 fd       	sbrc	r24, 4
+    3d04:	01 c0       	rjmp	.+2      	; 0x3d08 <getch+0x32>
+    3d06:	a8 95       	wdr
+    3d08:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+      ch = UART_UDR;
+    3d0c:	df 91       	pop	r29
+}
+    3d0e:	cf 91       	pop	r28
+    3d10:	1f 91       	pop	r17
+    3d12:	0f 91       	pop	r16
+    3d14:	ff 90       	pop	r15
+    3d16:	ef 90       	pop	r14
+    if (radio_present && (pkt_len || nrf24_rx_fifo_data())) {
+    3d18:	df 90       	pop	r13
+    3d1a:	08 95       	ret
+    3d1c:	88 23       	and	r24, r24
+    3d1e:	59 f3       	breq	.-42     	; 0x3cf6 <getch+0x20>
+  __asm__ __volatile__ (
+    3d20:	80 91 23 01 	lds	r24, 0x0123	; 0x800123 <pkt_len.3>
+      if (!pkt_len) {
+    3d24:	88 23       	and	r24, r24
+      ch = pkt_buf[pkt_start ++];
+    3d26:	a9 f0       	breq	.+42     	; 0x3d52 <getch+0x7c>
+    3d28:	a8 95       	wdr
+    3d2a:	80 91 23 01 	lds	r24, 0x0123	; 0x800123 <pkt_len.3>
+    3d2e:	88 23       	and	r24, r24
+    3d30:	d1 f0       	breq	.+52     	; 0x3d66 <getch+0x90>
+    3d32:	e0 91 02 01 	lds	r30, 0x0102	; 0x800102 <pkt_start.1>
+      pkt_len --;
+    3d36:	81 e0       	ldi	r24, 0x01	; 1
+    3d38:	8e 0f       	add	r24, r30
+    3d3a:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <pkt_start.1>
+  return ch;
+    3d3e:	f0 e0       	ldi	r31, 0x00	; 0
+	nrf24_csn(0);
+    3d40:	ed 5f       	subi	r30, 0xFD	; 253
+    3d42:	fe 4f       	sbci	r31, 0xFE	; 254
+	spi_transfer(addr | R_REGISTER);
+    3d44:	80 81       	ld	r24, Z
+    3d46:	90 91 23 01 	lds	r25, 0x0123	; 0x800123 <pkt_len.3>
+	ret = spi_transfer(0);
+    3d4a:	91 50       	subi	r25, 0x01	; 1
+    3d4c:	90 93 23 01 	sts	0x0123, r25	; 0x800123 <pkt_len.3>
+	if (level)
+    3d50:	dd cf       	rjmp	.-70     	; 0x3d0c <getch+0x36>
+    3d52:	06 df       	rcall	.-500    	; 0x3b60 <nrf24_csn.constprop.0>
+    if (radio_present && (pkt_len || nrf24_rx_fifo_data())) {
+    3d54:	87 e1       	ldi	r24, 0x17	; 23
+    3d56:	e0 de       	rcall	.-576    	; 0x3b18 <spi_transfer>
+	nrf24_write_reg(STATUS, 1 << RX_DR);
+    3d58:	80 e0       	ldi	r24, 0x00	; 0
+    3d5a:	de de       	rcall	.-580    	; 0x3b18 <spi_transfer>
+    3d5c:	c8 2f       	mov	r28, r24
+    3d5e:	f2 de       	rcall	.-540    	; 0x3b44 <nrf24_csn.part.0>
+	nrf24_csn(0);
+    3d60:	c0 ff       	sbrs	r28, 0
+    3d62:	e2 cf       	rjmp	.-60     	; 0x3d28 <getch+0x52>
+	spi_transfer(R_RX_PL_WID);
+    3d64:	c6 cf       	rjmp	.-116    	; 0x3cf2 <getch+0x1c>
+    3d66:	60 e4       	ldi	r22, 0x40	; 64
+    3d68:	87 e0       	ldi	r24, 0x07	; 7
+	ret = spi_transfer(0);
+    3d6a:	fc de       	rcall	.-520    	; 0x3b64 <nrf24_write_reg>
+    3d6c:	f9 de       	rcall	.-526    	; 0x3b60 <nrf24_csn.constprop.0>
+    3d6e:	80 e6       	ldi	r24, 0x60	; 96
+    3d70:	d3 de       	rcall	.-602    	; 0x3b18 <spi_transfer>
+	if (level)
+    3d72:	80 e0       	ldi	r24, 0x00	; 0
+    3d74:	d1 de       	rcall	.-606    	; 0x3b18 <spi_transfer>
+	*pkt_len = len;
+    3d76:	18 2f       	mov	r17, r24
+    3d78:	e5 de       	rcall	.-566    	; 0x3b44 <nrf24_csn.part.0>
+	nrf24_csn(0);
+    3d7a:	10 93 23 01 	sts	0x0123, r17	; 0x800123 <pkt_len.3>
+	spi_transfer(R_RX_PAYLOAD);
+    3d7e:	f0 de       	rcall	.-544    	; 0x3b60 <nrf24_csn.constprop.0>
+    3d80:	81 e6       	ldi	r24, 0x61	; 97
+    3d82:	ca de       	rcall	.-620    	; 0x3b18 <spi_transfer>
+	while (len --)
+    3d84:	c3 e0       	ldi	r28, 0x03	; 3
+    3d86:	d1 e0       	ldi	r29, 0x01	; 1
+    3d88:	1e 0d       	add	r17, r14
+    3d8a:	1c 13       	cpse	r17, r28
+	if (level)
+    3d8c:	2e c0       	rjmp	.+92     	; 0x3dea <getch+0x114>
+    3d8e:	da de       	rcall	.-588    	; 0x3b44 <nrf24_csn.part.0>
+        pkt_start = START;
+    3d90:	00 93 02 01 	sts	0x0102, r16	; 0x800102 <pkt_start.1>
+        if (!radio_mode && pkt_len >= 4) {
+    3d94:	80 91 47 01 	lds	r24, 0x0147	; 0x800147 <radio_mode>
+    3d98:	81 11       	cpse	r24, r1
+    3d9a:	19 c0       	rjmp	.+50     	; 0x3dce <getch+0xf8>
+    3d9c:	80 91 23 01 	lds	r24, 0x0123	; 0x800123 <pkt_len.3>
+    3da0:	84 30       	cpi	r24, 0x04	; 4
+    3da2:	38 f1       	brcs	.+78     	; 0x3df2 <getch+0x11c>
+	nrf24_write_addr_reg(TX_ADDR, addr);
+    3da4:	63 e0       	ldi	r22, 0x03	; 3
+    3da6:	71 e0       	ldi	r23, 0x01	; 1
+    3da8:	80 e1       	ldi	r24, 0x10	; 16
+    3daa:	f8 de       	rcall	.-528    	; 0x3b9c <nrf24_write_addr_reg>
+	nrf24_write_addr_reg(RX_ADDR_P0, addr);
+    3dac:	63 e0       	ldi	r22, 0x03	; 3
+    3dae:	71 e0       	ldi	r23, 0x01	; 1
+    3db0:	8a e0       	ldi	r24, 0x0A	; 10
+    3db2:	f4 de       	rcall	.-536    	; 0x3b9c <nrf24_write_addr_reg>
+          pkt_max_len = pkt_buf[3];
+    3db4:	80 91 06 01 	lds	r24, 0x0106	; 0x800106 <pkt_buf.2+0x3>
+    3db8:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <pkt_max_len>
+          pkt_len -= 4;
+    3dbc:	80 91 23 01 	lds	r24, 0x0123	; 0x800123 <pkt_len.3>
+    3dc0:	84 50       	subi	r24, 0x04	; 4
+    3dc2:	80 93 23 01 	sts	0x0123, r24	; 0x800123 <pkt_len.3>
+          radio_mode = 1;
+    3dc6:	d0 92 02 01 	sts	0x0102, r13	; 0x800102 <pkt_start.1>
+        if (!pkt_len)
+    3dca:	00 93 47 01 	sts	0x0147, r16	; 0x800147 <radio_mode>
+    3dce:	80 91 23 01 	lds	r24, 0x0123	; 0x800123 <pkt_len.3>
+        if (pkt_buf[0] == seqn) {
+    3dd2:	88 23       	and	r24, r24
+    3dd4:	09 f4       	brne	.+2      	; 0x3dd8 <getch+0x102>
+    3dd6:	8d cf       	rjmp	.-230    	; 0x3cf2 <getch+0x1c>
+    3dd8:	90 91 03 01 	lds	r25, 0x0103	; 0x800103 <pkt_buf.2>
+          pkt_len = 0;
+    3ddc:	20 91 00 01 	lds	r18, 0x0100	; 0x800100 <seqn.0>
+		*buf ++ = spi_transfer(0);
+    3de0:	92 13       	cpse	r25, r18
+    3de2:	0a c0       	rjmp	.+20     	; 0x3df8 <getch+0x122>
+    3de4:	10 92 23 01 	sts	0x0123, r1	; 0x800123 <pkt_len.3>
+    3de8:	84 cf       	rjmp	.-248    	; 0x3cf2 <getch+0x1c>
+          pkt_len = 0;
+    3dea:	80 e0       	ldi	r24, 0x00	; 0
+    3dec:	95 de       	rcall	.-726    	; 0x3b18 <spi_transfer>
+    3dee:	89 93       	st	Y+, r24
+        seqn = pkt_buf[0];
+    3df0:	cc cf       	rjmp	.-104    	; 0x3d8a <getch+0xb4>
+    3df2:	10 92 23 01 	sts	0x0123, r1	; 0x800123 <pkt_len.3>
+        pkt_len--;
+    3df6:	eb cf       	rjmp	.-42     	; 0x3dce <getch+0xf8>
+    3df8:	90 93 00 01 	sts	0x0100, r25	; 0x800100 <seqn.0>
+	if (nrf24_in_rx) {
+    3dfc:	81 50       	subi	r24, 0x01	; 1
+    3dfe:	80 93 23 01 	sts	0x0123, r24	; 0x800123 <pkt_len.3>
+    3e02:	97 cf       	rjmp	.-210    	; 0x3d32 <getch+0x5c>
+
+00003e04 <wait_timeout>:
+		nrf24_ce(0);
+    3e04:	80 91 45 01 	lds	r24, 0x0145	; 0x800145 <nrf24_in_rx>
+    3e08:	88 23       	and	r24, r24
+			nrf24_write_reg(CONFIG, CONFIG_VAL);
+    3e0a:	11 f0       	breq	.+4      	; 0x3e10 <wait_timeout+0xc>
+    3e0c:	80 e0       	ldi	r24, 0x00	; 0
+    3e0e:	9c de       	rcall	.-712    	; 0x3b48 <nrf24_ce>
+    3e10:	6c e7       	ldi	r22, 0x7C	; 124
+	nrf24_in_rx = 0;
+    3e12:	80 e0       	ldi	r24, 0x00	; 0
+    3e14:	a7 de       	rcall	.-690    	; 0x3b64 <nrf24_write_reg>
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    3e16:	10 92 45 01 	sts	0x0145, r1	; 0x800145 <nrf24_in_rx>
+    3e1a:	88 e1       	ldi	r24, 0x18	; 24
+  WDTCSR = x;
+    3e1c:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+    3e20:	88 e0       	ldi	r24, 0x08	; 8
+  while (1)			      // and busy-loop so that WD causes
+    3e22:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+  if (getch() != CRC_EOP)
+    3e26:	ff cf       	rjmp	.-2      	; 0x3e26 <wait_timeout+0x22>
+
+00003e28 <verifySpace>:
+    3e28:	56 df       	rcall	.-340    	; 0x3cd6 <getch>
+    3e2a:	80 32       	cpi	r24, 0x20	; 32
+    wait_timeout();
+    3e2c:	09 f0       	breq	.+2      	; 0x3e30 <verifySpace+0x8>
+    3e2e:	ea df       	rcall	.-44     	; 0x3e04 <wait_timeout>
+  putch(STK_INSYNC);
+    3e30:	84 e1       	ldi	r24, 0x14	; 20
+    3e32:	c7 ce       	rjmp	.-626    	; 0x3bc2 <putch>
+
+00003e34 <getNch>:
+    3e34:	cf 93       	push	r28
+void getNch(uint8_t count) {
+    3e36:	c8 2f       	mov	r28, r24
+    3e38:	4e df       	rcall	.-356    	; 0x3cd6 <getch>
+  do getch(); while (--count);
+    3e3a:	c1 50       	subi	r28, 0x01	; 1
+    3e3c:	e9 f7       	brne	.-6      	; 0x3e38 <getNch+0x4>
+    3e3e:	cf 91       	pop	r28
+    3e40:	f3 cf       	rjmp	.-26     	; 0x3e28 <verifySpace>
+
+00003e42 <watchdogConfig>:
+}
+    3e42:	e0 e6       	ldi	r30, 0x60	; 96
+  verifySpace();
+    3e44:	f0 e0       	ldi	r31, 0x00	; 0
+    3e46:	98 e1       	ldi	r25, 0x18	; 24
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    3e48:	90 83       	st	Z, r25
+    3e4a:	80 83       	st	Z, r24
+    3e4c:	08 95       	ret
+
+00003e4e <appStart>:
+    3e4e:	e0 e6       	ldi	r30, 0x60	; 96
+  WDTCSR = x;
+    3e50:	f0 e0       	ldi	r31, 0x00	; 0
+}
+    3e52:	98 e1       	ldi	r25, 0x18	; 24
+  WDTCSR = _BV(WDCE) | _BV(WDE);
+    3e54:	90 83       	st	Z, r25
+    3e56:	98 e2       	ldi	r25, 0x28	; 40
+    3e58:	90 83       	st	Z, r25
+    3e5a:	28 2e       	mov	r2, r24
+  WDTCSR = x;
+    3e5c:	ee 27       	eor	r30, r30
+    3e5e:	ff 27       	eor	r31, r31
+#endif
+
+  // save the reset flags in the designated register
+  //  This can be saved in a main program by putting code in .init0 (which
+  //  executes before normal c init code) to save R2 to a global variable.
+  __asm__ __volatile__ ("mov r2, %0\n" :: "r" (rstFlags));
+    3e60:	09 94       	ijmp
