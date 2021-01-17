@@ -26,7 +26,8 @@ static void delay8(uint16_t count) {
 		);
 }
 #ifndef TIMER
-#define my_delay(msec) delay8((int) (F_CPU / 8000L * (msec)))
+//#define my_delay(msec) delay8((int) (F_CPU / 8000L * (msec)))
+#define my_delay(usec) delay8((int) ((usec)))
 #endif
 
 static inline void nrf24_ce(uint8_t level) {
@@ -55,9 +56,9 @@ static inline void nrf24_ce(uint8_t level) {
 #else
 	/* This should take at least 10us (rising) or 200us (falling) */
 	if (level)
-		my_delay(0.01);
+		my_delay(10);
 	else
-		my_delay(0.2);
+		my_delay(200);
 #endif
 
 	if (level)
@@ -128,7 +129,7 @@ static uint8_t nrf24_tx_flush(void) {
 }
 
 static void nrf24_delay(void) {
-	my_delay(5);
+	my_delay(5000);
 }
 
 /* Enable 16-bit CRC */

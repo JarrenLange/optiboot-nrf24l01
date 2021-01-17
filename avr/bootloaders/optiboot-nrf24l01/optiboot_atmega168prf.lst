@@ -15,11 +15,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000028  00000000  00000000  0000070c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
-  6 .debug_info   00001445  00000000  00000000  00000734  2**0
+  6 .debug_info   00001448  00000000  00000000  00000734  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
-  7 .debug_abbrev 0000045e  00000000  00000000  00001b79  2**0
+  7 .debug_abbrev 0000045e  00000000  00000000  00001b7c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
-  8 .debug_line   000017aa  00000000  00000000  00001fd7  2**0
+  8 .debug_line   000017aa  00000000  00000000  00001fda  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
   9 .debug_frame  00000198  00000000  00000000  00003784  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -217,7 +217,7 @@ static int nrf24_init(void) {
     38d2:	80 e0       	ldi	r24, 0x00	; 0
 	if (level)
     38d4:	39 d1       	rcall	.+626    	; 0x3b48 <nrf24_ce>
-	my_delay(5);
+	my_delay(5000);
     38d6:	36 d1       	rcall	.+620    	; 0x3b44 <nrf24_csn.part.0>
     38d8:	88 e8       	ldi	r24, 0x88	; 136
     38da:	93 e1       	ldi	r25, 0x13	; 19
@@ -690,7 +690,7 @@ static uint8_t spi_transfer(uint8_t value) {
 	if (level)
     3b48:	88 23       	and	r24, r24
     3b4a:	29 f0       	breq	.+10     	; 0x3b56 <nrf24_ce+0xe>
-		my_delay(0.01);
+		my_delay(10);
     3b4c:	8a e0       	ldi	r24, 0x0A	; 10
     3b4e:	90 e0       	ldi	r25, 0x00	; 0
     3b50:	ed df       	rcall	.-38     	; 0x3b2c <delay8>
@@ -698,7 +698,7 @@ static uint8_t spi_transfer(uint8_t value) {
     3b52:	29 9a       	sbi	0x05, 1	; 5
 }
     3b54:	08 95       	ret
-		my_delay(0.2);
+		my_delay(200);
     3b56:	88 ec       	ldi	r24, 0xC8	; 200
     3b58:	90 e0       	ldi	r25, 0x00	; 0
     3b5a:	e8 df       	rcall	.-48     	; 0x3b2c <delay8>
@@ -831,7 +831,7 @@ void putch(char ch) {
       while (--cnt) {
     3bfc:	dd 24       	eor	r13, r13
     3bfe:	d3 94       	inc	r13
-        my_delay(4);
+        my_delay(4000);
     3c00:	11 50       	subi	r17, 0x01	; 1
     3c02:	09 f4       	brne	.+2      	; 0x3c06 <putch+0x44>
 	if (nrf24_in_rx) {

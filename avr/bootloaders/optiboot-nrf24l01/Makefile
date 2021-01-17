@@ -662,11 +662,14 @@ isp-stk500: $(PROGRAM)_$(TARGET).hex
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
 	$(SIZE) $@
 upload:
-	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U efuse:w:0xF9:m #Apparrently for 1kB boot, eFuse = F8?
-	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U hfuse:w:0xDE:m # 1.8V brownout
-	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -u -U lfuse:w:0xFA:m # Internal RC 8Mhz 6CK/14CK + 65ms
-	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -U flash:w:optiboot_atmega168prf.hex -v
-	- avrdude -p atmega168 -c stk500v1 -P COM4 -b19200 -F -U lock:w:0x0F:m -v
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -u -U efuse:w:0xF9:m #Apparrently for 1kB boot, eFuse = F8?
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -u -U hfuse:w:0xDE:m # 1.8V brownout
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -u -U lfuse:w:0xFA:m # Internal RC 8Mhz 6CK/14CK + 65ms
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -U flash:w:optiboot_atmega168prf.hex -v
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -U lock:w:0x0F:m -v
+	
+address_unit000: 
+	- avrdude -p atmega168 -c stk500v1 -P COM6 -b19200 -F -U eeprom:w:0x30,0x30,0x31,0x30,0x30,0x30:m
 
 clean:
 	rm -rf *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex *.tmp.sh

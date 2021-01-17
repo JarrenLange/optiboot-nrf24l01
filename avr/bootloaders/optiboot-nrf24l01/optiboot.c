@@ -845,7 +845,7 @@ void putch(char ch) {
 
       while (--cnt) {
         /* Wait 4ms to allow the remote end to switch to Rx mode */
-        my_delay(4);
+        my_delay(4000);
 
         nrf24_tx(pkt_buf, pkt_len);
         if (!nrf24_tx_result_wait())
@@ -865,7 +865,7 @@ void putch(char ch) {
       pkt_buf[0] ++;
 #else
       /* Wait 4ms to allow the remote end to switch to Rx mode */
-      my_delay(4);
+      my_delay(4000);
 
       nrf24_tx(pkt_buf, pkt_len);
       nrf24_tx_result_wait();
