@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<project>                                  
+  <executable name="NRFBootLoaderViaMicrochip.elf">                 
+    <memory name="program">              
+      <units>bytes</units>                 
+      <length>16384</length>                 
+      <used>2269</used>                     
+      <free>14115</free>                     
+    </memory>                              
+    <memory name="data">                 
+      <units>bytes</units>                 
+      <length>1024</length>                 
+      <used>71</used>                     
+      <free>953</free>                     
+    </memory>                              
+  </executable>                            
+</project>                                 
