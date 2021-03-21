@@ -301,7 +301,7 @@ static void nrf24_tx(uint8_t *buf, uint8_t len) {
 
 static int nrf24_tx_result_wait(void) {
 	uint8_t status;
-	uint16_t count = 10000; /* ~100ms timeout */
+	uint16_t count = 1000; /* ~100ms timeout */
 
 	status = nrf24_read_status();
 
@@ -310,7 +310,7 @@ static int nrf24_tx_result_wait(void) {
 
 	while ((!(status & (1 << TX_DS)) || (status & (1 << TX_FULL))) &&
 			!(status & (1 << MAX_RT)) && --count) {
-		delay8((int) (F_CPU / 8000L * 0.01));
+		delay8((int) (100));
 		status = nrf24_read_status();
 	}
 

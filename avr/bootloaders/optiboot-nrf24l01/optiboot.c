@@ -822,7 +822,16 @@ static void radio_init(void) {
    * The remote end's address will be set according to the contents
    * of the first packet we receive from the master.
    */
-  addr[0] = eeprom_read(0);
+  addr[0] = eeprom_read(0);/*
+  Since addresses defined by me, have a first value between 0x20 - 0x40 exclusive
+  */
+  /**/
+    if(addr[0] > 0x40||addr[0] < 0x20){
+        eeprom_write(0,0x30);
+        eeprom_write(1,0x30);
+        eeprom_write(2,0x31);
+        addr[0] = 0x30;
+     }
   addr[1] = eeprom_read(1);
   addr[2] = eeprom_read(2);
   nrf24_set_rx_addr(addr);

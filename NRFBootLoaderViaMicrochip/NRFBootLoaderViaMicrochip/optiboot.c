@@ -610,7 +610,7 @@ static uint8_t pkt_max_len = 32;
 #include "spi.h"
 #include "nrf24.h"
 
-//#define SEQN
+#define SEQN
 
 static void radio_init(void) {
   uint8_t addr[3];
@@ -876,7 +876,9 @@ void wait_timeout(void) {
 }
 
 void verifySpace(void) {
-  if (getch() != CRC_EOP)
+  char ch;
+  ch = getch();
+  if (ch!= CRC_EOP)
     wait_timeout();
   putch(STK_INSYNC);
 }

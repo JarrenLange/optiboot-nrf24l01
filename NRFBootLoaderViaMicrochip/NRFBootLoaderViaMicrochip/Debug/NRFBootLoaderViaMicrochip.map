@@ -178,7 +178,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x0000000000000000      0x350
+.text           0x0000000000000000      0x35c
  *(.vectors)
  .vectors       0x0000000000000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
                 0x0000000000000000                __vector_default
@@ -186,44 +186,44 @@ END GROUP
  *(.vectors)
  *(.progmem.gcc*)
  *(.dinit)
- .dinit         0x0000000000000068       0x11 data_init
-                0x000000000000007a                . = ALIGN (0x2)
- *fill*         0x0000000000000079        0x1 
-                0x000000000000007a                __trampolines_start = .
+ .dinit         0x0000000000000068       0x1d data_init
+                0x0000000000000086                . = ALIGN (0x2)
+ *fill*         0x0000000000000085        0x1 
+                0x0000000000000086                __trampolines_start = .
  *(.trampolines)
- .trampolines   0x000000000000007a        0x0 linker stubs
+ .trampolines   0x0000000000000086        0x0 linker stubs
  *(.trampolines*)
-                0x000000000000007a                __trampolines_end = .
+                0x0000000000000086                __trampolines_end = .
  *libprintf_flt.a:*(.progmem.data)
  *libc.a:*(.progmem.data)
-                0x000000000000007a                . = ALIGN (0x2)
+                0x0000000000000086                . = ALIGN (0x2)
  *(.jumptables)
  *(.jumptables*)
  *(.lowtext)
  *(.lowtext*)
-                0x000000000000007a                __ctors_start = .
+                0x0000000000000086                __ctors_start = .
  *(.ctors)
-                0x000000000000007a                __ctors_end = .
-                0x000000000000007a                __dtors_start = .
+                0x0000000000000086                __ctors_end = .
+                0x0000000000000086                __dtors_start = .
  *(.dtors)
-                0x000000000000007a                __dtors_end = .
+                0x0000000000000086                __dtors_end = .
  SORT(*)(.ctors)
  SORT(*)(.dtors)
  *(.init0)
- .init0         0x000000000000007a        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
-                0x000000000000007a                __init
+ .init0         0x0000000000000086        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
+                0x0000000000000086                __init
  *(.init0)
  *(.init1)
  *(.init1)
  *(.init2)
- .init2         0x000000000000007a        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
+ .init2         0x0000000000000086        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
  *(.init2)
  *(.init3)
  *(.init3)
  *(.init4)
- .init4         0x0000000000000086       0x3c c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_copy_data.o)
-                0x0000000000000086                __do_copy_data
-                0x00000000000000b4                __do_clear_bss
+ .init4         0x0000000000000092       0x3c c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_copy_data.o)
+                0x0000000000000092                __do_copy_data
+                0x00000000000000c0                __do_clear_bss
  *(.init4)
  *(.init5)
  *(.init5)
@@ -234,15 +234,15 @@ END GROUP
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x00000000000000c2        0x8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
- .init9         0x00000000000000ca      0x282 optiboot.o
-                0x00000000000000ca                main
+ .init9         0x00000000000000ce        0x8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
+ .init9         0x00000000000000d6      0x282 optiboot.o
+                0x00000000000000d6                main
  *(.init9)
-                0x000000000000034c                . = ALIGN (0x2)
+                0x0000000000000358                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000000000000034c        0x0 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_exit.o)
-                0x000000000000034c                _exit
-                0x000000000000034c                exit
+ .fini9         0x0000000000000358        0x0 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_exit.o)
+                0x0000000000000358                _exit
+                0x0000000000000358                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -261,11 +261,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000000000000034c        0x4 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_exit.o)
+ .fini0         0x0000000000000358        0x4 c:/program files/microchip/xc8/v2.31/avr/bin/../lib/gcc/avr/5.4.0/avr5/memx-const\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000000000000350                _etext = .
+                0x000000000000035c                _etext = .
 
-.data           0x0000000000800100        0x0 load address 0x0000000000000350
+.data           0x0000000000800100        0x0 load address 0x000000000000035c
                 0x0000000000800100                PROVIDE (__data_start, .)
  *(.gnu.linkonce.d*)
  *(.gnu.linkonce.r*)
@@ -277,8 +277,8 @@ END GROUP
                 0x0000000000800100                PROVIDE (__bss_start, .)
  *(COMMON)
                 0x0000000000800100                PROVIDE (__bss_end, .)
-                0x0000000000000350                __data_load_start = LOADADDR (.data)
-                0x0000000000000350                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000000000000035c                __data_load_start = LOADADDR (.data)
+                0x000000000000035c                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x0000000000800100        0x0
                 [!provide]                        PROVIDE (__noinit_start, .)
@@ -361,36 +361,36 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0x1c86
+.debug_info     0x0000000000000000     0x1ccd
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000      0x5f4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
- .debug_info    0x00000000000005f4     0x15e7 optiboot.o
- .debug_info    0x0000000000001bdb       0xab C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
+ .debug_info    0x00000000000005f4     0x162e optiboot.o
+ .debug_info    0x0000000000001c22       0xab C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
 
-.debug_abbrev   0x0000000000000000      0x86d
+.debug_abbrev   0x0000000000000000      0x88e
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000      0x5a2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
- .debug_abbrev  0x00000000000005a2      0x2b7 optiboot.o
- .debug_abbrev  0x0000000000000859       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
+ .debug_abbrev  0x00000000000005a2      0x2d8 optiboot.o
+ .debug_abbrev  0x000000000000087a       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
 
-.debug_line     0x0000000000000000      0xc95
+.debug_line     0x0000000000000000      0xccb
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x137 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
- .debug_line    0x0000000000000137      0xabd optiboot.o
- .debug_line    0x0000000000000bf4       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
+ .debug_line    0x0000000000000137      0xaf3 optiboot.o
+ .debug_line    0x0000000000000c2a       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
 
-.debug_frame    0x0000000000000000      0x280
+.debug_frame    0x0000000000000000      0x288
  *(.debug_frame)
- .debug_frame   0x0000000000000000      0x280 optiboot.o
+ .debug_frame   0x0000000000000000      0x288 optiboot.o
 
 .debug_str      0x0000000000000000      0x227
  *(.debug_str)
  .debug_str     0x0000000000000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
  .debug_str     0x0000000000000208       0x1f optiboot.o
 
-.debug_loc      0x0000000000000000      0xb4a
+.debug_loc      0x0000000000000000      0xbcd
  *(.debug_loc)
- .debug_loc     0x0000000000000000      0xb4a optiboot.o
+ .debug_loc     0x0000000000000000      0xbcd optiboot.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -410,9 +410,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x110
+.debug_ranges   0x0000000000000000      0x128
  *(.debug_ranges)
- .debug_ranges  0x0000000000000000      0x110 optiboot.o
+ .debug_ranges  0x0000000000000000      0x128 optiboot.o
 
 .debug_macro
  *(.debug_macro)
@@ -425,20 +425,20 @@ LOAD data_init
  .note.gnu.avr.deviceinfo
                 0x0000000000000000       0x40 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
 
-.bss.pkt_start.1991
-                0x0000000000800140        0x1
- .bss.pkt_start.1991
-                0x0000000000800140        0x1 optiboot.o
+.bss.pkt_start.1995
+                0x0000000000800141        0x1
+ .bss.pkt_start.1995
+                0x0000000000800141        0x1 optiboot.o
 
-.bss.pkt_buf.1992
+.bss.pkt_buf.1996
                 0x0000000000800100       0x20
- .bss.pkt_buf.1992
+ .bss.pkt_buf.1996
                 0x0000000000800100       0x20 optiboot.o
 
-.bss.pkt_len.1990
-                0x0000000000800141        0x1
- .bss.pkt_len.1990
-                0x0000000000800141        0x1 optiboot.o
+.bss.pkt_len.1994
+                0x0000000000800142        0x1
+ .bss.pkt_len.1994
+                0x0000000000800142        0x1 optiboot.o
 
 .bss.pkt_buf.1982
                 0x0000000000800120       0x20
@@ -446,201 +446,206 @@ LOAD data_init
                 0x0000000000800120       0x20 optiboot.o
 
 .bss.pkt_len.1981
-                0x0000000000800142        0x1
- .bss.pkt_len.1981
-                0x0000000000800142        0x1 optiboot.o
-
-.bss.nrf24_in_rx
                 0x0000000000800143        0x1
- .bss.nrf24_in_rx
+ .bss.pkt_len.1981
                 0x0000000000800143        0x1 optiboot.o
 
-.bss.radio_present
-                0x0000000000800145        0x1
- .bss.radio_present
-                0x0000000000800145        0x1 optiboot.o
+.bss.nrf24_in_rx
+                0x0000000000800144        0x1
+ .bss.nrf24_in_rx
+                0x0000000000800144        0x1 optiboot.o
 
-.bss.radio_mode
+.bss.radio_present
                 0x0000000000800146        0x1
- .bss.radio_mode
+ .bss.radio_present
                 0x0000000000800146        0x1 optiboot.o
 
-.text.getch     0x0000000000000350       0xa0
- .text.getch    0x0000000000000350       0xa0 optiboot.o
-                0x0000000000000350                getch
+.bss.radio_mode
+                0x0000000000800147        0x1
+ .bss.radio_mode
+                0x0000000000800147        0x1 optiboot.o
 
-.text.nrf24_tx  0x00000000000003f0       0x84
+.text.getch     0x000000000000035c       0xbe
+ .text.getch    0x000000000000035c       0xbe optiboot.o
+                0x000000000000035c                getch
+
+.text.nrf24_tx  0x000000000000041a       0x84
  .text.nrf24_tx
-                0x00000000000003f0       0x84 optiboot.o
+                0x000000000000041a       0x84 optiboot.o
 
 .text.radio_init
-                0x0000000000000474       0x7c
+                0x000000000000049e       0x7c
  .text.radio_init
-                0x0000000000000474       0x7c optiboot.o
+                0x000000000000049e       0x7c optiboot.o
 
 .text.nrf24_init
-                0x00000000000004f0       0x7a
+                0x000000000000051a       0x7a
  .text.nrf24_init
-                0x00000000000004f0       0x7a optiboot.o
+                0x000000000000051a       0x7a optiboot.o
 
 .text.nrf24_tx_result_wait
-                0x000000000000056a       0x76
+                0x0000000000000594       0x76
  .text.nrf24_tx_result_wait
-                0x000000000000056a       0x76 optiboot.o
+                0x0000000000000594       0x76 optiboot.o
+
+.text.putch     0x000000000000060a       0x76
+ .text.putch    0x000000000000060a       0x76 optiboot.o
+                0x000000000000060a                putch
 
 .text.nrf24_rx_read
-                0x00000000000005e0       0x62
+                0x0000000000000680       0x62
  .text.nrf24_rx_read
-                0x00000000000005e0       0x62 optiboot.o
-
-.text.putch     0x0000000000000642       0x54
- .text.putch    0x0000000000000642       0x54 optiboot.o
-                0x0000000000000642                putch
+                0x0000000000000680       0x62 optiboot.o
 
 .text.nrf24_idle_mode
-                0x0000000000000696       0x46
+                0x00000000000006e2       0x46
  .text.nrf24_idle_mode
-                0x0000000000000696       0x46 optiboot.o
+                0x00000000000006e2       0x46 optiboot.o
 
 .text.nrf24_write_addr_reg
-                0x00000000000006dc       0x30
+                0x0000000000000728       0x30
  .text.nrf24_write_addr_reg
-                0x00000000000006dc       0x30 optiboot.o
+                0x0000000000000728       0x30 optiboot.o
 
 .text.nrf24_rx_mode
-                0x000000000000070c       0x2c
+                0x0000000000000758       0x2c
  .text.nrf24_rx_mode
-                0x000000000000070c       0x2c optiboot.o
+                0x0000000000000758       0x2c optiboot.o
 
-.text.delay8    0x0000000000000738       0x20
- .text.delay8   0x0000000000000738       0x20 optiboot.o
+.text.delay8    0x0000000000000784       0x20
+ .text.delay8   0x0000000000000784       0x20 optiboot.o
 
 .text.nrf24_write_reg
-                0x0000000000000758       0x20
+                0x00000000000007a4       0x20
  .text.nrf24_write_reg
-                0x0000000000000758       0x20 optiboot.o
+                0x00000000000007a4       0x20 optiboot.o
 
 .text.nrf24_set_tx_addr
-                0x0000000000000778       0x1c
+                0x00000000000007c4       0x1c
  .text.nrf24_set_tx_addr
-                0x0000000000000778       0x1c optiboot.o
+                0x00000000000007c4       0x1c optiboot.o
 
-.text.avrlibc   0x0000000000000794       0x1c
- .text.avrlibc  0x0000000000000794       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
-                0x0000000000000794                eeprom_write_byte
-                0x0000000000000796                eeprom_write_r18
+.text.avrlibc   0x00000000000007e0       0x1c
+ .text.avrlibc  0x00000000000007e0       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const\libatmega168p.a(eewr_byte.o)
+                0x00000000000007e0                eeprom_write_byte
+                0x00000000000007e2                eeprom_write_r18
 
-.text.spi_init  0x00000000000007b0       0x1a
+.text.spi_init  0x00000000000007fc       0x1a
  .text.spi_init
-                0x00000000000007b0       0x1a optiboot.o
+                0x00000000000007fc       0x1a optiboot.o
 
 .text.nrf24_rx_data_avail
-                0x00000000000007ca       0x1a
+                0x0000000000000816       0x1a
  .text.nrf24_rx_data_avail
-                0x00000000000007ca       0x1a optiboot.o
+                0x0000000000000816       0x1a optiboot.o
 
 .text.eeprom_write
-                0x00000000000007e4       0x18
+                0x0000000000000830       0x18
  .text.eeprom_write
-                0x00000000000007e4       0x18 optiboot.o
+                0x0000000000000830       0x18 optiboot.o
 
 .text.spi_transfer
-                0x00000000000007fc       0x18
+                0x0000000000000848       0x18
  .text.spi_transfer
-                0x00000000000007fc       0x18 optiboot.o
+                0x0000000000000848       0x18 optiboot.o
 
 .text.nrf24_read_reg
-                0x0000000000000814       0x18
+                0x0000000000000860       0x18
  .text.nrf24_read_reg
-                0x0000000000000814       0x18 optiboot.o
+                0x0000000000000860       0x18 optiboot.o
 
 .text.nrf24_read_status
-                0x000000000000082c       0x14
+                0x0000000000000878       0x14
  .text.nrf24_read_status
-                0x000000000000082c       0x14 optiboot.o
+                0x0000000000000878       0x14 optiboot.o
 
 .text.nrf24_tx_flush
-                0x0000000000000840       0x14
+                0x000000000000088c       0x14
  .text.nrf24_tx_flush
-                0x0000000000000840       0x14 optiboot.o
+                0x000000000000088c       0x14 optiboot.o
 
 .text.verifySpace
-                0x0000000000000854       0x14
+                0x00000000000008a0       0x14
  .text.verifySpace
-                0x0000000000000854       0x14 optiboot.o
-                0x0000000000000854                verifySpace
+                0x00000000000008a0       0x14 optiboot.o
+                0x00000000000008a0                verifySpace
 
 .text.eeprom_read
-                0x0000000000000868       0x12
+                0x00000000000008b4       0x12
  .text.eeprom_read
-                0x0000000000000868       0x12 optiboot.o
+                0x00000000000008b4       0x12 optiboot.o
 
-.text.spi_mode  0x000000000000087a       0x12
+.text.spi_mode  0x00000000000008c6       0x12
  .text.spi_mode
-                0x000000000000087a       0x12 optiboot.o
+                0x00000000000008c6       0x12 optiboot.o
 
-.text.appStart  0x000000000000088c       0x10
+.text.appStart  0x00000000000008d8       0x10
  .text.appStart
-                0x000000000000088c       0x10 optiboot.o
-                0x000000000000088c                appStart
+                0x00000000000008d8       0x10 optiboot.o
+                0x00000000000008d8                appStart
 
 .text.nrf24_rx_fifo_data
-                0x000000000000089c        0xe
+                0x00000000000008e8        0xe
  .text.nrf24_rx_fifo_data
-                0x000000000000089c        0xe optiboot.o
+                0x00000000000008e8        0xe optiboot.o
 
 .text.wait_timeout
-                0x00000000000008aa        0xe
+                0x00000000000008f6        0xe
  .text.wait_timeout
-                0x00000000000008aa        0xe optiboot.o
-                0x00000000000008aa                wait_timeout
+                0x00000000000008f6        0xe optiboot.o
+                0x00000000000008f6                wait_timeout
 
 .text.watchdogConfig
-                0x00000000000008b8        0xc
+                0x0000000000000904        0xc
  .text.watchdogConfig
-                0x00000000000008b8        0xc optiboot.o
-                0x00000000000008b8                watchdogConfig
+                0x0000000000000904        0xc optiboot.o
+                0x0000000000000904                watchdogConfig
 
 .text.nrf24_delay
-                0x00000000000008c4        0xa
+                0x0000000000000910        0xa
  .text.nrf24_delay
-                0x00000000000008c4        0xa optiboot.o
+                0x0000000000000910        0xa optiboot.o
 
 .text.nrf24_set_rx_addr
-                0x00000000000008ce        0xa
+                0x000000000000091a        0xa
  .text.nrf24_set_rx_addr
-                0x00000000000008ce        0xa optiboot.o
+                0x000000000000091a        0xa optiboot.o
 
-.text           0x00000000000008d8        0x4
- .text          0x00000000000008d8        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
-                0x00000000000008d8                __vector_22
-                0x00000000000008d8                __vector_1
-                0x00000000000008d8                __vector_24
-                0x00000000000008d8                __vector_12
-                0x00000000000008d8                __bad_interrupt
-                0x00000000000008d8                __vector_6
-                0x00000000000008d8                __vector_3
-                0x00000000000008d8                __vector_23
-                0x00000000000008d8                __vector_25
-                0x00000000000008d8                __vector_11
-                0x00000000000008d8                __vector_13
-                0x00000000000008d8                __vector_17
-                0x00000000000008d8                __vector_19
-                0x00000000000008d8                __vector_7
-                0x00000000000008d8                __vector_5
-                0x00000000000008d8                __vector_4
-                0x00000000000008d8                __vector_9
-                0x00000000000008d8                __vector_2
-                0x00000000000008d8                __vector_21
-                0x00000000000008d8                __vector_15
-                0x00000000000008d8                __vector_8
-                0x00000000000008d8                __vector_14
-                0x00000000000008d8                __vector_10
-                0x00000000000008d8                __vector_16
-                0x00000000000008d8                __vector_18
-                0x00000000000008d8                __vector_20
+.text           0x0000000000000924        0x4
+ .text          0x0000000000000924        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/xc8/avr/lib/avr5/memx-const/crtatmega168p.o
+                0x0000000000000924                __vector_22
+                0x0000000000000924                __vector_1
+                0x0000000000000924                __vector_24
+                0x0000000000000924                __vector_12
+                0x0000000000000924                __bad_interrupt
+                0x0000000000000924                __vector_6
+                0x0000000000000924                __vector_3
+                0x0000000000000924                __vector_23
+                0x0000000000000924                __vector_25
+                0x0000000000000924                __vector_11
+                0x0000000000000924                __vector_13
+                0x0000000000000924                __vector_17
+                0x0000000000000924                __vector_19
+                0x0000000000000924                __vector_7
+                0x0000000000000924                __vector_5
+                0x0000000000000924                __vector_4
+                0x0000000000000924                __vector_9
+                0x0000000000000924                __vector_2
+                0x0000000000000924                __vector_21
+                0x0000000000000924                __vector_15
+                0x0000000000000924                __vector_8
+                0x0000000000000924                __vector_14
+                0x0000000000000924                __vector_10
+                0x0000000000000924                __vector_16
+                0x0000000000000924                __vector_18
+                0x0000000000000924                __vector_20
+
+.data.seqn.1997
+                0x0000000000800140        0x1 load address 0x0000000000000928
+ .data.seqn.1997
+                0x0000000000800140        0x1 optiboot.o
 
 .data.pkt_max_len
-                0x0000000000800144        0x1 load address 0x00000000000008dc
+                0x0000000000800145        0x1 load address 0x0000000000000929
  .data.pkt_max_len
-                0x0000000000800144        0x1 optiboot.o
+                0x0000000000800145        0x1 optiboot.o
